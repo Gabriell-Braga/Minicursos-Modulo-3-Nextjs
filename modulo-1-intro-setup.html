@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <title>Módulo 1: Next.js — Introdução e setup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 400: '#4ade80', 500: '#22c55e', 600: '#16a34a' },
+          },
+          fontFamily: {
+            sans: ['Urbanist', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="stylesheet" href="deck.css">
+</head>
+<body class="tw-slides bg-slate-950 font-sans antialiased">
+<header class="site-header fixed left-0 right-0 top-0 z-[1001] flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 bg-[#020617] px-5 py-2 font-sans" role="banner">
+  <input type="checkbox" id="site-nav-toggle" class="site-header__toggle">
+  <div class="site-header__bar">
+    <label for="site-nav-toggle" class="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-slate-700 bg-slate-900 text-brand-500">
+      <span class="visually-hidden">Abrir ou fechar menu de navegação</span>
+      <i class="fa-solid fa-bars site-header__burger-open" aria-hidden="true"></i>
+      <i class="fa-solid fa-xmark site-header__burger-close" aria-hidden="true"></i>
+    </label>
+  </div>
+  <nav class="site-header__panel" id="site-header-panel" aria-label="Navegação do curso Next.js">
+    <div class="site-header__group flex flex-wrap items-center gap-2">
+      <span class="site-header__label mr-1 text-xs font-bold uppercase tracking-widest text-slate-500">Módulos Next.js</span>
+      <a href="modulo-1-intro-setup.html" class="site-header__link pointer-events-none inline-flex items-center gap-2 rounded-xl border border-brand-500 bg-brand-500/10 px-4 py-2 text-sm font-semibold text-brand-400 transition" aria-current="page"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Módulo 1 · Intro</a>
+      <a href="modulo-2-rotas-layouts.html" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Módulo 2 · Rotas</a>
+      <a href="modulo-3-componentes-client.html" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Módulo 3 · Componentes</a>
+      <a href="modulo-4-dados-deploy.html" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Módulo 4 · Dados</a>
+    </div>
+    <div class="site-header__group flex flex-wrap items-center gap-2">
+      <span class="site-header__label mr-1 text-xs font-bold uppercase tracking-widest text-slate-500">Projeto</span>
+      <a href="exemplos/fluxolab-app/README.md" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-rocket" aria-hidden="true"></i> FluxoLab app (README / npm run dev)</a>
+    </div>
+    <div class="site-header__group flex flex-wrap items-center gap-2">
+      <span class="site-header__label mr-1 text-xs font-bold uppercase tracking-widest text-slate-500">Links</span>
+      <a href="../Apresentação Tailwind/modulo-1-intro-setup.html" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-wind" aria-hidden="true"></i> Curso Tailwind · Módulo 1</a>
+    </div>
+  </nav>
+  <label for="site-nav-toggle" class="site-header__backdrop"><span class="visually-hidden">Fechar menu</span></label>
+</header>
+
+<nav class="slide-controls fixed bottom-0 left-0 right-0 z-[1000] flex min-h-14 items-center justify-center gap-7 border-t border-slate-800 bg-gradient-to-t from-slate-950 via-slate-900 to-slate-950 px-6 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_rgba(0,0,0,0.35)] md:bottom-auto md:top-12 md:border-b md:border-t-0 md:bg-gradient-to-b md:from-slate-950 md:via-slate-900 md:to-slate-950 md:pb-0 md:shadow-[0_8px_24px_rgba(0,0,0,0.35)]" aria-label="Navegação da apresentação">
+  <button type="button" id="prev-slide" class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-600 bg-slate-800 text-lg text-brand-500 transition hover:border-brand-500 hover:bg-slate-700 hover:text-brand-400 disabled:cursor-not-allowed disabled:opacity-35" aria-label="Slide anterior"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+  <span id="slide-counter" class="min-w-[6rem] select-none text-center text-sm font-semibold tracking-widest text-slate-400" aria-live="polite"><span class="current text-brand-400">1</span> / <span id="slide-total">—</span></span>
+  <button type="button" id="next-slide" class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-600 bg-slate-800 text-lg text-brand-500 transition hover:border-brand-500 hover:bg-slate-700 hover:text-brand-400 disabled:cursor-not-allowed disabled:opacity-35" aria-label="Próximo slide"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+</nav>
+
+<div class="slides-deck">
+  <div class="slide-container is-active">
+    <div class="slide-fullbleed-bg flex flex-col items-center justify-center bg-cover bg-center bg-no-repeat px-4 text-center" style="background-image:linear-gradient(rgba(2,6,23,0.88),rgba(2,6,23,0.92)),url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&amp;fit=crop&amp;w=1920&amp;q=80')">
+      <p class="mb-4 text-sm font-bold uppercase tracking-[0.35em] text-brand-400">Módulo 1 · Next.js</p>
+      <h1 class="text-5xl font-extrabold uppercase leading-tight text-white sm:text-6xl md:text-7xl">Introdução &amp; <span class="text-brand-500">setup</span></h1>
+      <p class="mt-8 max-w-2xl text-lg font-medium tracking-widest text-slate-400 sm:text-xl">CREATE-NEXT-APP, APP ROUTER E PRIMEIRA LANDING</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="flex w-full grow flex-col items-center justify-center text-center">
+      <hr class="mb-6 h-2 w-36 border-0 bg-brand-500">
+      <h2 class="mb-4 text-5xl font-extrabold uppercase text-brand-500 sm:text-6xl">Continuidade</h2>
+      <p class="max-w-3xl text-xl text-slate-400">Depois de HTML e Tailwind, agora entramos no framework React focado em aplicações de produção.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-8 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Módulo 1 <span class="text-brand-500">na prática</span></h2>
+      <ul class="space-y-5 text-lg text-slate-400 md:text-xl">
+        <li><i class="fa-solid fa-check text-brand-500"></i> Entender o que é Next.js e quando usar.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Configurar um projeto com App Router e Tailwind.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Navegar pela estrutura inicial de pastas e arquivos.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Entregar a primeira tela de landing que será evoluída nos próximos módulos.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-8 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">O que é <span class="text-brand-500">Next.js</span>?</h2>
+      <ul class="space-y-4 text-lg text-slate-400 md:text-xl">
+        <li><strong class="text-brand-400">Meta-framework React</strong>: adiciona convenções e ferramentas prontas para produção.</li>
+        <li><strong class="text-brand-400">Roteamento por arquivos</strong>: pastas e arquivos viram URLs.</li>
+        <li><strong class="text-brand-400">SSR/SSG</strong>: pode renderizar no servidor e gerar páginas estáticas.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-8 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">React recap <span class="text-brand-500">rápido</span></h2>
+      <div class="grid w-full grow grid-cols-1 items-center gap-10 md:grid-cols-2 md:gap-12">
+        <ul class="space-y-4 text-lg text-slate-400 md:text-xl">
+          <li><strong class="text-white">Componentes</strong> encapsulam UI e lógica.</li>
+          <li><strong class="text-white">JSX</strong> descreve interface com sintaxe parecida com HTML.</li>
+          <li><strong class="text-white">Props</strong> passam dados de pai para filho.</li>
+        </ul>
+        <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+          <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">component.tsx</span></div>
+          <pre class="max-h-[340px] overflow-auto p-5 text-sm leading-relaxed text-slate-300 md:text-base"><span class="text-pink-400">export default function</span> <span class="text-sky-300">Card</span>(props: { titulo: string }) {
+  <span class="text-pink-400">return</span> (
+    &lt;<span class="text-pink-400">article</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"rounded-xl border border-slate-700 p-4"</span>&gt;
+      &lt;<span class="text-pink-400">h3</span>&gt;{props.titulo}&lt;/<span class="text-pink-400">h3</span>&gt;
+    &lt;/<span class="text-pink-400">article</span>&gt;
+  );
+}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-8 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Por que Next.js vs <span class="text-brand-500">React puro</span>?</h2>
+      <ul class="space-y-4 text-lg text-slate-400 md:text-xl">
+        <li><i class="fa-solid fa-bolt text-brand-500"></i> Rotas automáticas por arquivos.</li>
+        <li><i class="fa-solid fa-layer-group text-brand-500"></i> Layouts aninhados nativos.</li>
+        <li><i class="fa-solid fa-gauge-high text-brand-500"></i> Otimizações embutidas (imagem, fonte, build).</li>
+        <li><i class="fa-solid fa-server text-brand-500"></i> Renderização híbrida sem configurar tudo do zero.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-8 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">App Router vs <span class="text-brand-500">Pages Router</span></h2>
+      <div class="grid w-full grow grid-cols-1 gap-8 md:grid-cols-2">
+        <div class="rounded-2xl border border-brand-500/40 bg-brand-500/10 p-6">
+          <h3 class="text-2xl font-bold text-brand-400">App Router (atual)</h3>
+          <p class="mt-3 text-lg text-slate-300">Baseado em pasta <code class="font-mono text-sky-300">app/</code>, com layouts, server components e data fetching moderno.</p>
+        </div>
+        <div class="rounded-2xl border border-slate-700 bg-slate-900 p-6">
+          <h3 class="text-2xl font-bold text-slate-300">Pages Router (legado)</h3>
+          <p class="mt-3 text-lg text-slate-400">Mantido por compatibilidade, mas neste curso vamos usar apenas o App Router.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="flex w-full grow flex-col items-center justify-center text-center">
+      <hr class="mb-6 h-2 w-36 border-0 bg-brand-500">
+      <h2 class="mb-4 text-5xl font-extrabold uppercase text-brand-500 sm:text-6xl">Setup</h2>
+      <p class="max-w-xl text-xl text-slate-400">Criando a base técnica do projeto</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-8 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Pré-requisitos <span class="text-brand-500">Node.js + npm</span></h2>
+      <ul class="space-y-4 text-lg text-slate-400 md:text-xl">
+        <li>Instalar Node.js LTS (já inclui o npm).</li>
+        <li>Confirmar versões no terminal.</li>
+      </ul>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">terminal</span></div>
+        <pre class="max-h-[260px] overflow-auto p-5 text-sm leading-relaxed text-slate-300 md:text-base"><span class="text-brand-400">node</span> --version
+<span class="text-brand-400">npm</span> --version</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-8 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">create-next-app <span class="text-brand-500">com flags</span></h2>
+      <p class="mb-3 text-lg text-slate-400">Use o assistente já configurando TypeScript, Tailwind, App Router e pasta <code class="font-mono text-sky-300">src</code>.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">comando base</span></div>
+        <pre class="max-h-[320px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-brand-400">npx</span> create-next-app@latest meu-app \
+  <span class="text-brand-400">--ts</span> \
+  <span class="text-brand-400">--tailwind</span> \
+  <span class="text-brand-400">--app</span> \
+  <span class="text-brand-400">--src-dir</span> \
+  <span class="text-brand-400">--eslint</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-8 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Estrutura inicial <span class="text-brand-500">de pastas</span></h2>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">tree</span></div>
+        <pre class="max-h-[320px] overflow-auto p-5 text-sm leading-relaxed text-slate-300 md:text-base">meu-app/
+├─ <span class="text-brand-400">src/</span>
+│  └─ <span class="text-brand-400">app/</span>
+│     ├─ layout.tsx
+│     ├─ page.tsx
+│     └─ globals.css
+├─ <span class="text-brand-400">public/</span>
+└─ package.json</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-8 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">`layout.tsx` <span class="text-brand-500">shell compartilhado</span></h2>
+      <p class="mb-3 text-lg text-slate-400">Define estrutura global com <code class="font-mono text-sky-300">html</code> e <code class="font-mono text-sky-300">body</code>, aplicada em todas as rotas.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/app/layout.tsx</span></div>
+        <pre class="max-h-[320px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">export default function</span> RootLayout({ children }: { children: React.ReactNode }) {
+  <span class="text-pink-400">return</span> (
+    &lt;<span class="text-pink-400">html</span> <span class="text-amber-300">lang</span>=<span class="text-brand-400">"pt-BR"</span>&gt;
+      &lt;<span class="text-pink-400">body</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"bg-slate-950 text-slate-100 antialiased"</span>&gt;
+        {children}
+      &lt;/<span class="text-pink-400">body</span>&gt;
+    &lt;/<span class="text-pink-400">html</span>&gt;
+  );
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-8 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">`page.tsx` <span class="text-brand-500">UI da rota</span></h2>
+      <p class="mb-3 text-lg text-slate-400">Cada arquivo <code class="font-mono text-sky-300">page.tsx</code> representa uma página. No App Router, por padrão é Server Component.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/app/page.tsx</span></div>
+        <pre class="max-h-[320px] overflow-auto p-5 text-sm leading-relaxed text-slate-300 md:text-base"><span class="text-pink-400">export default function</span> HomePage() {
+  <span class="text-pink-400">return</span> &lt;<span class="text-pink-400">main</span>&gt;Olá Next.js&lt;/<span class="text-pink-400">main</span>&gt;;
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-8 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Server Components <span class="text-brand-500">conceito</span></h2>
+      <ul class="space-y-4 text-lg text-slate-400 md:text-xl">
+        <li>Rodam no servidor e enviam HTML pronto para o cliente.</li>
+        <li>Não usam <code class="font-mono text-sky-300">useState</code> ou hooks de browser por padrão.</li>
+        <li>Ótimos para performance inicial e acesso seguro a dados.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="flex w-full grow flex-col items-center justify-center text-center">
+      <hr class="mb-6 h-2 w-36 border-0 bg-brand-500">
+      <h2 class="mb-4 text-5xl font-extrabold uppercase text-brand-500 sm:text-6xl">Tailwind no Next</h2>
+      <p class="max-w-xl text-xl text-slate-400">Estilo global e tipografia moderna</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-8 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">`globals.css` com <span class="text-brand-500">Tailwind v4</span></h2>
+      <p class="mb-3 text-lg text-slate-400">No v4, comece com <code class="font-mono text-sky-300">@import "tailwindcss"</code> e personalize tokens em <code class="font-mono text-sky-300">@theme</code>.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/app/globals.css</span></div>
+        <pre class="max-h-[320px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">@import</span> <span class="text-brand-400">"tailwindcss"</span>;
+
+<span class="text-pink-400">@theme</span> {
+  --color-brand-400: <span class="text-brand-400">#4ade80</span>;
+  --color-brand-500: <span class="text-brand-400">#22c55e</span>;
+  --color-brand-600: <span class="text-brand-400">#16a34a</span>;
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-8 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Fonte com <span class="text-brand-500">`next/font/google`</span></h2>
+      <p class="mb-3 text-lg text-slate-400">Carregue fontes com otimização automática e sem layout shift desnecessário.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">layout.tsx</span></div>
+        <pre class="max-h-[320px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import</span> { Urbanist } <span class="text-pink-400">from</span> <span class="text-brand-400">"next/font/google"</span>;
+
+<span class="text-pink-400">const</span> urbanist = Urbanist({
+  subsets: [<span class="text-brand-400">"latin"</span>],
+  variable: <span class="text-brand-400">"--font-urbanist"</span>,
+});
+
+&lt;<span class="text-pink-400">body</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">{`${urbanist.variable} font-sans`}</span>&gt;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-8 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Scripts de execução <span class="text-brand-500">dev e build</span></h2>
+      <ul class="space-y-4 text-lg text-slate-400 md:text-xl">
+        <li><code class="font-mono text-sky-300">npm run dev</code>: ambiente local com hot reload.</li>
+        <li><code class="font-mono text-sky-300">npm run build</code>: build de produção otimizado.</li>
+      </ul>
+      <div class="mt-4 rounded-xl border border-slate-700 bg-slate-900 p-6 text-sm text-slate-400">
+        Dica: rode o build antes de publicar para validar erros de tipagem e renderização.
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-8 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">`metadata` no <span class="text-brand-500">layout</span></h2>
+      <p class="mb-3 text-lg text-slate-400">Configure título e descrição da aplicação direto no arquivo de layout.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">layout.tsx</span></div>
+        <pre class="max-h-[320px] overflow-auto p-5 text-sm leading-relaxed text-slate-300 md:text-base"><span class="text-pink-400">import type</span> { Metadata } <span class="text-pink-400">from</span> <span class="text-brand-400">"next"</span>;
+
+<span class="text-pink-400">export const</span> metadata: Metadata = {
+  title: <span class="text-brand-400">"Meu App Next"</span>,
+  description: <span class="text-brand-400">"Aplicação criada no módulo de introdução."</span>,
+};</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="flex w-full grow flex-col items-center justify-center text-center">
+      <hr class="mb-6 h-2 w-36 border-0 bg-brand-500">
+      <h2 class="mb-4 text-5xl font-extrabold uppercase text-brand-500 sm:text-6xl">Projeto</h2>
+      <p class="max-w-3xl text-xl text-slate-400">Parte 1 de 4 · <strong class="text-white">20 passos</strong> guiados para iniciar a landing do FluxoLab.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-8 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Mapa da evolução <span class="text-brand-500">4 módulos</span></h2>
+      <ul class="space-y-4 text-lg text-slate-400 md:text-xl">
+        <li><strong class="text-brand-400">M1</strong> · setup + hero textual simples.</li>
+        <li><strong class="text-brand-400">M2</strong> · rotas, nested layouts e <code class="font-mono text-sky-300">Link</code>.</li>
+        <li><strong class="text-brand-400">M3</strong> · client components e interações.</li>
+        <li><strong class="text-brand-400">M4</strong> · deploy no GitHub Pages.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-8 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 1/20 <span class="text-brand-500">create-next-app</span></h2>
+      <p class="mb-3 text-lg text-slate-400">Criar o projeto <code class="font-mono text-sky-300">fluxolab-app</code> com as opções padrão do curso.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">terminal</span></div>
+        <pre class="max-h-[320px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-brand-400">npx</span> create-next-app@latest fluxolab-app \
+  <span class="text-brand-400">--ts</span> \
+  <span class="text-brand-400">--tailwind</span> \
+  <span class="text-brand-400">--app</span> \
+  <span class="text-brand-400">--src-dir</span> \
+  <span class="text-brand-400">--eslint</span></pre>
+      </div>
+    </div>
+  </div>
+
+    <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 2/20 · Entender as <span class="text-brand-500">opções</span> do CLI</h2>
+      <ul class="space-y-3 text-lg text-slate-400">
+        <li><code class="font-mono text-sky-300">--ts</code> — TypeScript em todo o projeto.</li>
+        <li><code class="font-mono text-sky-300">--tailwind</code> — Tailwind v4 já configurado.</li>
+        <li><code class="font-mono text-sky-300">--app</code> — App Router (pasta <code class="font-mono text-sky-300">src/app</code>).</li>
+        <li><code class="font-mono text-sky-300">--src-dir</code> — código dentro de <code class="font-mono text-sky-300">src/</code>.</li>
+        <li><code class="font-mono text-sky-300">--eslint</code> — lint básico desde o início.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-8 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 3/20 <span class="text-brand-500">globals.css</span></h2>
+      <p class="mb-3 text-lg text-slate-400">Aplicar tokens de marca e base escura para ficar alinhado com o curso Tailwind.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/app/globals.css</span></div>
+        <pre class="max-h-[320px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">@import</span> <span class="text-brand-400">"tailwindcss"</span>;
+
+<span class="text-pink-400">@theme inline</span> {
+  --color-brand-400: <span class="text-brand-400">#4ade80</span>;
+  --color-brand-500: <span class="text-brand-400">#22c55e</span>;
+  --color-brand-600: <span class="text-brand-400">#16a34a</span>;
+  --font-sans: <span class="text-brand-400">var(--font-urbanist)</span>, system-ui, sans-serif;
+}
+
+<span class="text-pink-400">body</span> {
+  <span class="text-amber-300">@apply</span> min-h-screen bg-slate-950 font-sans text-slate-100 antialiased;
+}</pre>
+      </div>
+    </div>
+  </div>
+
+    <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 4/20 · Entrar na pasta e <span class="text-brand-500">instalar</span></h2>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">terminal</span></div>
+        <pre class="p-5 text-sm text-slate-300"><span class="text-brand-400">cd</span> fluxolab-app
+<span class="text-brand-400">npm</span> install</pre>
+      </div>
+      <p class="mt-4 text-sm text-slate-500">O <code class="font-mono text-sky-300">npm install</code> baixa Next.js, React e Tailwind para a pasta <code class="font-mono text-sky-300">node_modules</code>.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 5/20 <span class="text-brand-500">layout</span> · fonte e metadata</h2>
+      <p class="mb-3 text-lg text-slate-400">Imports, Urbanist e metadata — ainda sem o JSX do layout.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/app/layout.tsx (parte 1)</span></div>
+        <pre class="max-h-[280px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import type</span> { Metadata } <span class="text-pink-400">from</span> <span class="text-brand-400">"next"</span>;
+<span class="text-pink-400">import</span> { Urbanist } <span class="text-pink-400">from</span> <span class="text-brand-400">"next/font/google"</span>;
+<span class="text-pink-400">import</span> <span class="text-brand-400">"./globals.css"</span>;
+
+<span class="text-pink-400">const</span> urbanist = Urbanist({
+  subsets: [<span class="text-brand-400">"latin"</span>],
+  weight: [<span class="text-brand-400">"400"</span>, <span class="text-brand-400">"500"</span>, <span class="text-brand-400">"600"</span>, <span class="text-brand-400">"700"</span>, <span class="text-brand-400">"800"</span>],
+  variable: <span class="text-brand-400">"--font-urbanist"</span>,
+});
+
+<span class="text-pink-400">export const</span> metadata: Metadata = {
+  title: <span class="text-brand-400">"FluxoLab"</span>,
+  description: <span class="text-brand-400">"Landing inicial em Next.js."</span>,
+};</pre>
+      </div>
+    </div>
+  </div>
+
+    <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 6/20 · Estrutura <span class="text-brand-500">App Router</span></h2>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <pre class="p-5 text-xs text-slate-300">fluxolab-app/
+├── src/app/
+│   ├── layout.tsx    <span class="text-slate-500">← envolve todas as páginas</span>
+│   ├── page.tsx      <span class="text-slate-500">← rota /</span>
+│   └── globals.css
+├── public/
+└── package.json</pre>
+      </div>
+      <p class="mt-4 text-lg text-slate-400">Cada pasta com <code class="font-mono text-sky-300">page.tsx</code> vira uma URL — veremos isso no Módulo 2.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 7/20 <span class="text-brand-500">layout</span> · estrutura HTML</h2>
+      <p class="mb-3 text-lg text-slate-400">O componente <code class="font-mono text-sky-300">RootLayout</code> envolve todas as páginas do app.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/app/layout.tsx (parte 2)</span></div>
+        <pre class="max-h-[220px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">export default function</span> <span class="text-amber-300">RootLayout</span>({ children }: { children: React.ReactNode }) {
+  <span class="text-pink-400">return</span> (
+    &lt;<span class="text-pink-400">html</span> <span class="text-amber-300">lang</span>=<span class="text-brand-400">"pt-br"</span> <span class="text-amber-300">className</span>={urbanist.variable}&gt;
+      &lt;<span class="text-pink-400">body</span>&gt;{children}&lt;/<span class="text-pink-400">body</span>&gt;
+    &lt;/<span class="text-pink-400">html</span>&gt;
+  );
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 8/20 <span class="text-brand-500">hero simples</span></h2>
+      <p class="mb-3 text-lg text-slate-400">Criar a home em uma coluna, só texto e CTA (sem imagem ainda).</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/app/page.tsx</span></div>
+        <pre class="max-h-[320px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm">&lt;<span class="text-pink-400">main</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mx-auto max-w-5xl px-6 py-20"</span>&gt;
+  &lt;<span class="text-pink-400">h1</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"text-4xl font-extrabold text-white"</span>&gt;Organize fluxos com clareza&lt;/<span class="text-pink-400">h1</span>&gt;
+  &lt;<span class="text-pink-400">p</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mt-4 text-lg text-slate-300"</span>&gt;Primeiro passo do projeto FluxoLab.&lt;/<span class="text-pink-400">p</span>&gt;
+  &lt;<span class="text-pink-400">button</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mt-8 rounded-xl bg-brand-500 px-5 py-3 font-bold text-slate-950"</span>&gt;Quero testar&lt;/<span class="text-pink-400">button</span>&gt;
+&lt;/<span class="text-pink-400">main</span>&gt;</pre>
+      </div>
+    </div>
+  </div>
+
+    <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 9/20 · <span class="text-brand-500">page.tsx</span> vs layout</h2>
+      <ul class="space-y-3 text-lg text-slate-400">
+        <li><strong class="text-white">layout.tsx</strong> — shell fixo (fonte, metadata, elementos globais).</li>
+        <li><strong class="text-white">page.tsx</strong> — conteúdo que muda por rota; na home é a landing.</li>
+        <li>O layout recebe <code class="font-mono text-sky-300">{children}</code> e injeta o conteúdo da page.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 10/20 <span class="text-brand-500">rodar o projeto</span></h2>
+      <ul class="space-y-4 text-lg text-slate-400 md:text-xl">
+        <li>Entrar na pasta do app.</li>
+        <li>Executar servidor local.</li>
+      </ul>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">terminal</span></div>
+        <pre class="max-h-[260px] overflow-auto p-5 text-sm leading-relaxed text-slate-300 md:text-base"><span class="text-brand-400">cd</span> fluxolab-app
+<span class="text-brand-400">npm</span> run dev</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 11/20 · <span class="text-brand-500">Font Awesome</span> no layout</h2>
+      <p class="mb-3 text-lg text-slate-400">Ícones usados no Header, cards e formulários — carregue o CDN no <code class="font-mono text-sky-300">layout.tsx</code> antes do Módulo 3.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/app/layout.tsx · dentro de &lt;html&gt;</span></div>
+        <pre class="max-h-[220px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm">&lt;<span class="text-pink-400">html</span> <span class="text-amber-300">lang</span>=<span class="text-brand-400">"pt-br"</span> <span class="text-amber-300">className</span>={urbanist.variable}&gt;
+  &lt;<span class="text-pink-400">head</span>&gt;
+    &lt;<span class="text-pink-400">link</span>
+      <span class="text-amber-300">rel</span>=<span class="text-brand-400">"stylesheet"</span>
+      <span class="text-amber-300">href</span>=<span class="text-brand-400">"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"</span>
+    /&gt;
+  &lt;/<span class="text-pink-400">head</span>&gt;
+  &lt;<span class="text-pink-400">body</span>&gt;{children}&lt;/<span class="text-pink-400">body</span>&gt;
+&lt;/<span class="text-pink-400">html</span>&gt;</pre>
+      </div>
+    </div>
+  </div>
+
+    <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 12/20 · <span class="text-brand-500">Hot reload</span></h2>
+      <p class="mb-3 text-lg text-slate-400">Com <code class="font-mono text-sky-300">npm run dev</code> rodando, salve qualquer arquivo — o navegador atualiza sozinho.</p>
+      <ul class="mt-4 space-y-2 text-lg text-slate-400">
+        <li>Teste: mude o título do hero e salve <code class="font-mono text-sky-300">page.tsx</code>.</li>
+        <li>Erros de sintaxe aparecem no terminal e no overlay do navegador.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 13/20 · Validar no <span class="text-brand-500">navegador</span></h2>
+      <p class="mb-3 text-lg text-slate-400">Abra <code class="font-mono text-sky-300">http://localhost:3000</code> e confira se a home inicial aparece com tema escuro e tipografia Urbanist.</p>
+      <ul class="mt-4 space-y-3 text-lg text-slate-400">
+        <li><i class="fa-solid fa-circle-check text-brand-500"></i> Título e parágrafo do hero simples visíveis.</li>
+        <li><i class="fa-solid fa-circle-check text-brand-500"></i> Botão verde de CTA renderizando.</li>
+        <li><i class="fa-solid fa-circle-check text-brand-500"></i> Sem erros no terminal onde roda <code class="font-mono text-sky-300">npm run dev</code>.</li>
+      </ul>
+      <p class="mt-4 text-sm text-slate-500">O hero inline será substituído por um componente no Módulo 3 — isso é esperado.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 14/20 · Alias <span class="text-brand-500">@/</span></h2>
+      <p class="mb-3 text-lg text-slate-400">O template já mapeia <code class="font-mono text-sky-300">@/</code> para <code class="font-mono text-sky-300">src/</code> — usaremos em imports como <code class="font-mono text-sky-300">@/components/Header</code>.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <pre class="p-5 text-xs text-slate-300">// tsconfig.json (trecho)
+"paths": { "@/*": ["./src/*"] }</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 15/20 · Scripts do <span class="text-brand-500">package.json</span></h2>
+      <ul class="space-y-2 text-lg text-slate-400">
+        <li><code class="font-mono text-sky-300">npm run dev</code> — servidor local com hot reload.</li>
+        <li><code class="font-mono text-sky-300">npm run build</code> — build de produção (usado no Módulo 4).</li>
+        <li><code class="font-mono text-sky-300">npm run lint</code> — verifica problemas de código.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 16/20 · Erros comuns no <span class="text-brand-500">setup</span></h2>
+      <ul class="space-y-3 text-lg text-slate-400">
+        <li><strong class="text-slate-300">Porta 3000 ocupada</strong> — feche outro <code class="font-mono text-sky-300">npm run dev</code> ou use outra porta.</li>
+        <li><strong class="text-slate-300">Pasta errada</strong> — rode comandos dentro de <code class="font-mono text-sky-300">fluxolab-app</code>.</li>
+        <li><strong class="text-slate-300">Typo em className</strong> — Tailwind não aplica classe com nome errado.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 17/20 · Estrutura ao fim do <span class="text-brand-500">M1</span></h2>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">estrutura esperada</span></div>
+        <pre class="max-h-[280px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm">fluxolab-app/
+├── src/app/
+│   ├── globals.css       <span class="text-slate-500">← tokens de marca</span>
+│   ├── layout.tsx        <span class="text-slate-500">← Urbanist + Font Awesome</span>
+│   └── page.tsx          <span class="text-slate-500">← hero simples (temporário)</span>
+├── package.json
+└── next.config.ts        <span class="text-slate-500">← padrão do create-next-app</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 18/20 · O que vem no <span class="text-brand-500">Módulo 2</span></h2>
+      <ul class="space-y-3 text-lg text-slate-400">
+        <li>Header persistente no <code class="font-mono text-sky-300">layout.tsx</code>.</li>
+        <li>Rotas <code class="font-mono text-sky-300">/precos</code> e <code class="font-mono text-sky-300">/contato</code> com conteúdo completo.</li>
+        <li>Navegação com <code class="font-mono text-sky-300">Link</code> e metadata por página.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 19/20 · Conferir no <span class="text-brand-500">README</span></h2>
+      <p class="text-lg text-slate-400">Compare o estado atual com a tabela de checkpoints em <code class="font-mono text-sky-300">exemplos/fluxolab-app/README.md</code>.</p>
+      <a href="exemplos/fluxolab-app/README.md" class="mt-6 inline-flex w-fit items-center gap-2 rounded-xl border border-brand-500/50 bg-brand-500/10 px-5 py-3 text-base font-semibold text-brand-400 transition hover:border-brand-500 hover:bg-brand-500/20 hover:text-brand-300"><i class="fa-solid fa-book-open" aria-hidden="true"></i> Abrir checkpoint do FluxoLab</a>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 20/20 · Checkpoint <span class="text-brand-500">M1</span></h2>
+      <ul class="space-y-4 text-lg text-slate-400">
+        <li><i class="fa-solid fa-square-check text-brand-500"></i> Projeto Next.js criado com App Router.</li>
+        <li><i class="fa-solid fa-square-check text-brand-500"></i> Tema global e cores de marca aplicados.</li>
+        <li><i class="fa-solid fa-square-check text-brand-500"></i> Layout com Urbanist, metadata e Font Awesome.</li>
+        <li><i class="fa-solid fa-square-check text-brand-500"></i> Home inicial renderizando com <code class="font-mono text-sky-300">npm run dev</code>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col items-center justify-center text-center">
+      <hr class="mb-6 h-2 w-36 border-0 bg-brand-500">
+      <h2 class="mb-4 text-5xl font-extrabold uppercase text-brand-500 sm:text-6xl">Próximo passo</h2>
+      <p class="max-w-2xl text-xl text-slate-400">No módulo 2 vamos abrir novas rotas, layouts aninhados e navegação com <code class="font-mono text-sky-300">Link</code>.</p>
+      <a href="modulo-2-rotas-layouts.html" class="mt-8 inline-flex items-center gap-2 rounded-xl border border-brand-500/50 bg-brand-500/10 px-6 py-3 text-lg font-bold text-brand-400 transition hover:border-brand-500 hover:bg-brand-500/20 hover:text-brand-300"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i> Ir para Módulo 2</a>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <title>Módulo 4: Next.js — Dados e deploy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 400: '#4ade80', 500: '#22c55e', 600: '#16a34a' }
+          },
+          fontFamily: {
+            sans: ['Urbanist', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="deck.css">
+</head>
+<body class="tw-slides bg-slate-950 font-sans antialiased">
+<header class="site-header fixed left-0 right-0 top-0 z-[1001] flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 bg-[#020617] px-5 py-2 font-sans" role="banner">
+  <input type="checkbox" id="site-nav-toggle" class="site-header__toggle">
+  <div class="site-header__bar">
+    <label for="site-nav-toggle" class="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-slate-700 bg-slate-900 text-brand-500">
+      <span class="visually-hidden">Abrir ou fechar menu de navegação</span>
+      <i class="fa-solid fa-bars site-header__burger-open" aria-hidden="true"></i>
+      <i class="fa-solid fa-xmark site-header__burger-close" aria-hidden="true"></i>
+    </label>
+  </div>
+  <nav class="site-header__panel" id="site-header-panel" aria-label="Navegação do curso Next.js">
+    <div class="site-header__group flex flex-wrap items-center gap-2">
+      <span class="site-header__label mr-1 text-xs font-bold uppercase tracking-widest text-slate-500">Apresentações</span>
+      <a href="modulo-1-intro-setup.html" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Módulo 1 · Intro</a>
+      <a href="modulo-2-rotas-layouts.html" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Módulo 2 · Rotas</a>
+      <a href="modulo-3-componentes-client.html" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Módulo 3 · Componentes</a>
+      <a href="modulo-4-dados-deploy.html" class="site-header__link pointer-events-none inline-flex items-center gap-2 rounded-xl border border-brand-500 bg-brand-500/10 px-4 py-2 text-sm font-semibold text-brand-400 transition" aria-current="page"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Módulo 4 · Dados</a>
+    </div>
+    <div class="site-header__group flex flex-wrap items-center gap-2">
+      <span class="site-header__label mr-1 text-xs font-bold uppercase tracking-widest text-slate-500">Projeto</span>
+      <a href="exemplos/fluxolab-app/README.md" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-file-code" aria-hidden="true"></i> README</a>
+      <a href="exemplos/fluxolab-app/" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-folder-open" aria-hidden="true"></i> Pasta</a>
+    </div>
+    <div class="site-header__group flex flex-wrap items-center gap-2">
+      <span class="site-header__label mr-1 text-xs font-bold uppercase tracking-widest text-slate-500">Links</span>
+      <a href="../Apresentação Tailwind/modulo-1-intro-setup.html" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-wind" aria-hidden="true"></i> Curso Tailwind</a>
+    </div>
+  </nav>
+  <label for="site-nav-toggle" class="site-header__backdrop"><span class="visually-hidden">Fechar menu</span></label>
+</header>
+
+<nav class="slide-controls fixed bottom-0 left-0 right-0 z-[1000] flex min-h-14 items-center justify-center gap-7 border-t border-slate-800 bg-gradient-to-t from-slate-950 via-slate-900 to-slate-950 px-6 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_rgba(0,0,0,0.35)] md:bottom-auto md:top-12 md:border-b md:border-t-0 md:bg-gradient-to-b md:from-slate-950 md:via-slate-900 md:to-slate-950 md:pb-0 md:shadow-[0_8px_24px_rgba(0,0,0,0.35)]" aria-label="Navegação da apresentação">
+  <button type="button" id="prev-slide" class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-600 bg-slate-800 text-lg text-brand-500 transition hover:border-brand-500 hover:bg-slate-700 hover:text-brand-400 disabled:cursor-not-allowed disabled:opacity-35" aria-label="Slide anterior"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+  <span id="slide-counter" class="min-w-[6rem] select-none text-center text-sm font-semibold tracking-widest text-slate-400" aria-live="polite"><span class="current text-brand-400">1</span> / <span id="slide-total">—</span></span>
+  <button type="button" id="next-slide" class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-600 bg-slate-800 text-lg text-brand-500 transition hover:border-brand-500 hover:bg-slate-700 hover:text-brand-400 disabled:cursor-not-allowed disabled:opacity-35" aria-label="Próximo slide"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+</nav>
+
+<div class="slides-deck">
+  <div class="slide-container is-active">
+    <div class="slide-fullbleed-bg flex flex-col items-center justify-center bg-cover bg-center bg-no-repeat px-4 text-center" style="background-image:linear-gradient(rgba(2,6,23,0.88),rgba(2,6,23,0.92)),url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&amp;fit=crop&amp;w=1920&amp;q=80')">
+      <p class="mb-4 text-sm font-bold uppercase tracking-[0.35em] text-brand-400">Módulo 4 · Next.js</p>
+      <h1 class="text-5xl font-extrabold uppercase leading-tight text-white sm:text-6xl md:text-7xl">Dados &amp; <span class="text-brand-500">deploy</span></h1>
+      <p class="mt-8 max-w-2xl text-lg font-medium tracking-widest text-slate-400 sm:text-xl">FETCH, BUILD ESTÁTICO E GITHUB PAGES</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="flex w-full grow flex-col items-center justify-center text-center">
+      <hr class="mb-6 h-2 w-36 border-0 bg-brand-500">
+      <h2 class="mb-4 text-5xl font-extrabold uppercase text-brand-500 sm:text-6xl">Meta final</h2>
+      <p class="max-w-3xl text-xl text-slate-400">Consumir dados, finalizar a interface e publicar em produção.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Agenda <span class="text-brand-500">do módulo</span></h2>
+      <ul class="space-y-4 text-lg text-slate-300 md:text-xl">
+        <li><i class="fa-solid fa-check text-brand-500"></i> Fetch assíncrono em Server Components.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Conceito de renderização estática.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Benefícios de <code class="font-mono text-sky-300">next/image</code>.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Variáveis de ambiente em alto nível.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Build estático (<code class="font-mono text-sky-300">output: 'export'</code>) e deploy gratuito no GitHub Pages.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Server Component com <span class="text-brand-500">async fetch</span></h2>
+      <p class="mb-4 text-lg text-slate-300">Você pode fazer fetch diretamente no componente de página com <code class="font-mono text-sky-300">async/await</code>.</p>
+      <div class="rounded-xl border border-slate-700 bg-slate-900 p-5 font-mono text-xs text-slate-300 md:text-sm">export default async function Page() {
+  const data = await fetch(url).then(r =&gt; r.json());
+  return &lt;main&gt;...&lt;/main&gt;;
+}</div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Renderização <span class="text-brand-500">estática</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Com <code class="font-mono text-sky-300">output: 'export'</code> no Next.js, o build gera HTML/CSS/JS puros na pasta <code class="font-mono text-sky-300">out/</code> — ideal para GitHub Pages.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">next.config.ts</span></div>
+        <pre class="max-h-[200px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">const</span> nextConfig = {
+  output: <span class="text-brand-400">"export"</span>,  <span class="text-slate-500">// gera pasta out/ com arquivos estáticos</span>
+  trailingSlash: <span class="text-brand-400">true</span>, <span class="text-slate-500">// ajuda rotas no GitHub Pages</span>
+};</pre>
+      </div>
+      <ul class="mt-4 space-y-2 text-base text-slate-400">
+        <li>Sem servidor Node em produção — só arquivos estáticos.</li>
+        <li>Hospedagem gratuita no GitHub Pages.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl"><code class="font-mono">next/image</code> na prática</h2>
+      <p class="mb-4 text-lg text-slate-300">O componente de imagem do Next otimiza tamanho, formato e carregamento.</p>
+      <ul class="space-y-3 text-lg text-slate-300">
+        <li>Lazy loading por padrão em muitos cenários.</li>
+        <li>Ajuda a melhorar métricas de performance visual.</li>
+        <li>Controle de dimensões evita layout shift.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Variáveis de <span class="text-brand-500">ambiente</span></h2>
+      <p class="mb-4 text-lg text-slate-300">Dados sensíveis vão em <code class="font-mono text-sky-300">.env.local</code>, nunca hardcoded no código.</p>
+      <div class="rounded-xl border border-slate-700 bg-slate-900/80 p-5 text-slate-300">
+        <p><code class="font-mono text-sky-300">NEXT_PUBLIC_*</code> expõe ao cliente.</p>
+        <p class="mt-2">Sem prefixo, a variável fica só no servidor.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Build <span class="text-brand-500">estático</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Com as variáveis de ambiente certas, o build gera a pasta <code class="font-mono text-sky-300">out/</code> pronta para publicar.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">terminal</span></div>
+        <pre class="max-h-[200px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-slate-500"># Linux / macOS</span>
+<span class="text-brand-400">GITHUB_PAGES</span>=true <span class="text-brand-400">GITHUB_REPOSITORY</span>=seu-usuario/fluxolab-app <span class="text-brand-400">npm</span> run build
+
+<span class="text-slate-500"># Resultado: pasta out/ com index.html, precos/, contato/...</span></pre>
+      </div>
+      <p class="mt-3 text-sm text-slate-500">Teste local: <code class="font-mono text-sky-300">npx serve out</code> e abra a URL indicada.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Deploy no <span class="text-brand-500">GitHub Pages</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Hospedagem <strong class="text-white">gratuita</strong> para sites estáticos — perfeita para o FluxoLab.</p>
+      <ul class="space-y-3 text-lg text-slate-300">
+        <li><i class="fa-brands fa-github text-brand-500"></i> Repositório no GitHub com o código do app.</li>
+        <li><i class="fa-solid fa-gears text-brand-500"></i> GitHub Actions faz o build e publica automaticamente.</li>
+        <li><i class="fa-solid fa-link text-brand-500"></i> URL final: <code class="font-mono text-sky-300">https://seu-usuario.github.io/nome-do-repo/</code></li>
+      </ul>
+      <p class="mt-4 text-sm text-slate-500">Repositório em subpasta do site exige <code class="font-mono text-sky-300">basePath</code> no <code class="font-mono text-sky-300">next.config.ts</code>.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Boas práticas <span class="text-brand-500">pré-release</span></h2>
+      <ul class="space-y-4 text-lg text-slate-300">
+        <li>Testar rotas principais e páginas secundárias.</li>
+        <li>Revisar metadados de título/descrição.</li>
+        <li>Verificar imagens remotas configuradas.</li>
+        <li>Confirmar fallback para rota inexistente.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Ambientes: dev, preview e <span class="text-brand-500">produção</span></h2>
+      <ul class="space-y-4 text-lg text-slate-300">
+        <li><strong class="text-white">Dev local:</strong> ciclo rápido para construir features.</li>
+        <li><strong class="text-white">Preview:</strong> revisão antes de publicar oficialmente.</li>
+        <li><strong class="text-white">Produção:</strong> versão estável para utilizadores finais.</li>
+      </ul>
+      <p class="mt-4 text-sm text-slate-500">Mantenha o mesmo checklist de validação entre preview e produção.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Checklist de <span class="text-brand-500">teoria</span></h2>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div class="rounded-xl border border-brand-500/40 bg-brand-500/10 p-5 text-slate-200">Fetch assíncrono no servidor.</div>
+        <div class="rounded-xl border border-brand-500/40 bg-brand-500/10 p-5 text-slate-200">Renderização estática para conteúdo estável.</div>
+        <div class="rounded-xl border border-brand-500/40 bg-brand-500/10 p-5 text-slate-200"><code class="font-mono text-sky-300">next/image</code> para otimizar mídia.</div>
+        <div class="rounded-xl border border-brand-500/40 bg-brand-500/10 p-5 text-slate-200">Deploy gratuito no GitHub Pages via Actions.</div>
+      </div>
+    </div>
+  </div>
+
+    <div class="slide-container">
+    <div class="flex w-full grow flex-col items-center justify-center text-center">
+      <hr class="mb-6 h-2 w-36 border-0 bg-brand-500">
+      <h2 class="mb-4 text-5xl font-extrabold uppercase text-brand-500 sm:text-6xl">Projeto guiado</h2>
+      <p class="max-w-3xl text-xl text-slate-400">Módulo 4 focado em <strong class="text-white">deploy</strong>: do <code class="font-mono text-sky-300">next.config</code> até o site online no GitHub Pages — <strong class="text-white">20 passos</strong>.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="flex w-full grow flex-col items-center justify-center text-center">
+      <hr class="mb-6 h-2 w-36 border-0 bg-brand-500">
+      <h2 class="mb-4 text-4xl font-extrabold uppercase text-brand-500 sm:text-5xl">Deploy no GitHub Pages</h2>
+      <p class="max-w-3xl text-xl text-slate-400">Passo a passo literal — do <code class="font-mono text-sky-300">next.config</code> até o site online.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 1/20 · Visão geral do <span class="text-brand-500">fluxo</span></h2>
+      <p class="mb-4 text-lg text-slate-300">O deploy tem <strong class="text-white">4 fases</strong>. Siga nesta ordem — pular uma fase costuma causar erro.</p>
+      <ol class="space-y-3 text-lg text-slate-400">
+        <li><span class="font-bold text-brand-400">A</span> · Configurar <code class="font-mono text-sky-300">next.config.ts</code> para export estático + <code class="font-mono text-sky-300">basePath</code></li>
+        <li><span class="font-bold text-brand-400">B</span> · Testar build local (gerar pasta <code class="font-mono text-sky-300">out/</code> e abrir no navegador)</li>
+        <li><span class="font-bold text-brand-400">C</span> · Criar workflow + enviar código para o GitHub (<code class="font-mono text-sky-300">git push</code>)</li>
+        <li><span class="font-bold text-brand-400">D</span> · Ativar GitHub Pages e aguardar a Action publicar o site</li>
+      </ol>
+      <p class="mt-4 text-sm text-slate-500"><code class="font-mono text-sky-300">npm run dev</code> continua igual no dia a dia — as mudanças abaixo só afetam <code class="font-mono text-sky-300">npm run build</code> com variáveis de ambiente.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 2/20 · Entender a <span class="text-brand-500">URL final</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Repositórios de projeto usam subpasta no domínio do GitHub:</p>
+      <div class="mt-3 rounded-xl border border-slate-700 bg-slate-900/80 p-5 font-mono text-sm text-slate-300">
+        <p>https://<span class="text-brand-400">SEU-USUARIO</span>.github.io/<span class="text-sky-300">NOME-DO-REPO</span>/</p>
+        <p class="mt-3 text-slate-500">Exemplo: usuário <span class="text-brand-400">maria-dev</span>, repo <span class="text-sky-300">fluxolab-app</span></p>
+        <p class="mt-1 text-brand-400">→ https://maria-dev.github.io/fluxolab-app/</p>
+      </div>
+      <ul class="mt-4 space-y-2 text-base text-slate-400">
+        <li><i class="fa-solid fa-arrow-right text-brand-500"></i> Home: <code class="font-mono text-sky-300">/fluxolab-app/</code></li>
+        <li><i class="fa-solid fa-arrow-right text-brand-500"></i> Preços: <code class="font-mono text-sky-300">/fluxolab-app/precos/</code></li>
+        <li><i class="fa-solid fa-arrow-right text-brand-500"></i> Contato: <code class="font-mono text-sky-300">/fluxolab-app/contato/</code></li>
+      </ul>
+      <p class="mt-4 text-sm text-slate-500">Por isso o Next precisa de <code class="font-mono text-sky-300">basePath: "/fluxolab-app"</code> no build de produção.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 3/20 · Substituir <code class="font-mono">next.config.ts</code> <span class="text-brand-500">inteiro</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Abra <code class="font-mono text-sky-300">next.config.ts</code> na raiz do projeto e <strong class="text-white">substitua todo o conteúdo</strong> por este arquivo:</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">next.config.ts (arquivo completo)</span></div>
+        <pre class="max-h-[380px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import type</span> { NextConfig } <span class="text-pink-400">from</span> <span class="text-brand-400">"next"</span>;
+
+<span class="text-pink-400">const</span> isGithubPages = process.env.GITHUB_PAGES === <span class="text-brand-400">"true"</span>;
+<span class="text-pink-400">const</span> repoName = process.env.GITHUB_REPOSITORY?.split(<span class="text-brand-400">"/"</span>)[<span class="text-brand-400">1</span>];
+<span class="text-pink-400">const</span> basePath =
+  isGithubPages &amp;&amp; repoName ? <span class="text-brand-400">`/${repoName}`</span> : <span class="text-brand-400">""</span>;
+
+<span class="text-pink-400">const</span> nextConfig: NextConfig = {
+  ...(isGithubPages ? { output: <span class="text-brand-400">"export"</span> <span class="text-pink-400">as const</span> } : {}),
+  basePath: basePath || <span class="text-brand-400">undefined</span>,
+  assetPrefix: basePath ? <span class="text-brand-400">`${basePath}/`</span> : <span class="text-brand-400">undefined</span>,
+  trailingSlash: isGithubPages,
+  images: {
+    unoptimized: isGithubPages,
+    remotePatterns: [
+      { protocol: <span class="text-brand-400">"https"</span>, hostname: <span class="text-brand-400">"images.unsplash.com"</span> },
+    ],
+  },
+};
+
+<span class="text-pink-400">export default</span> nextConfig;</pre>
+      </div>
+      <p class="mt-3 text-sm text-slate-500">Salve o arquivo. Não precisa reiniciar o <code class="font-mono text-sky-300">npm run dev</code> por causa disso.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 4/20 · O que cada linha do <span class="text-brand-500">next.config</span> faz</h2>
+      <ul class="space-y-3 text-base text-slate-300 md:text-lg">
+        <li><code class="font-mono text-sky-300">GITHUB_PAGES === "true"</code> — liga modo GitHub Pages só no build de produção.</li>
+        <li><code class="font-mono text-sky-300">GITHUB_REPOSITORY</code> — Actions envia <code class="font-mono text-sky-300">usuario/repo</code>; extraímos o nome do repo.</li>
+        <li><code class="font-mono text-sky-300">output: "export"</code> — gera HTML estático na pasta <code class="font-mono text-sky-300">out/</code> (obrigatório no Pages).</li>
+        <li><code class="font-mono text-sky-300">basePath</code> + <code class="font-mono text-sky-300">assetPrefix</code> — CSS/JS/links funcionam em <code class="font-mono text-sky-300">/nome-do-repo/</code>.</li>
+        <li><code class="font-mono text-sky-300">trailingSlash: true</code> — URLs com barra final; evita 404 no Pages.</li>
+        <li><code class="font-mono text-sky-300">images.unoptimized</code> — export estático não tem servidor de imagens do Next.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 5/20 · Checklist <span class="text-brand-500">antes do build</span></h2>
+      <ul class="space-y-3 text-lg text-slate-300">
+        <li><i class="fa-solid fa-square-check text-brand-500"></i> Você está na pasta <code class="font-mono text-sky-300">fluxolab-app</code> (onde está o <code class="font-mono text-sky-300">package.json</code>).</li>
+        <li><i class="fa-solid fa-square-check text-brand-500"></i> <code class="font-mono text-sky-300">npm run dev</code> funcionava sem erros antes deste passo.</li>
+        <li><i class="fa-solid fa-square-check text-brand-500"></i> Já definiu o nome do repositório GitHub (ex.: <code class="font-mono text-sky-300">fluxolab-app</code>).</li>
+        <li><i class="fa-solid fa-square-check text-brand-500"></i> Anotou seu usuário GitHub (ex.: <code class="font-mono text-sky-300">maria-dev</code>).</li>
+      </ul>
+      <p class="mt-4 text-sm text-slate-500">Nos comandos abaixo, troque <strong class="text-slate-300">seu-usuario</strong> e <strong class="text-slate-300">fluxolab-app</strong> pelos seus valores reais.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 6/20 · Build no <span class="text-brand-500">Windows</span> · preparação</h2>
+      <p class="mb-3 text-lg text-slate-300"><strong class="text-white">1–3.</strong> Abra o PowerShell na pasta do projeto, confirme <code class="font-mono text-sky-300">package.json</code> e defina as variáveis:</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">PowerShell</span></div>
+        <pre class="max-h-[200px] overflow-auto p-5 text-sm text-slate-300"><span class="text-brand-400">cd</span> C:\caminho\para\fluxolab-app
+<span class="text-brand-400">$env:GITHUB_PAGES</span> = <span class="text-brand-400">"true"</span>
+<span class="text-brand-400">$env:GITHUB_REPOSITORY</span> = <span class="text-brand-400">"seu-usuario/fluxolab-app"</span></pre>
+      </div>
+      <p class="mt-3 text-sm text-amber-400/90"><i class="fa-solid fa-triangle-exclamation"></i> As variáveis valem só nesta janela do terminal.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 7/20 · Build no <span class="text-brand-500">Windows</span> · executar</h2>
+      <p class="mb-3 text-lg text-slate-300"><strong class="text-white">4.</strong> Rode o build de produção:</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <pre class="p-5 text-sm text-slate-300"><span class="text-brand-400">npm</span> run build</pre>
+      </div>
+      <p class="mt-4 text-base text-slate-400"><strong class="text-white">Sucesso</strong> se no final aparecer algo como:</p>
+      <ul class="mt-2 space-y-1 text-sm text-slate-500">
+        <li><code class="font-mono text-sky-300">✓ Compiled successfully</code></li>
+        <li><code class="font-mono text-sky-300">✓ Generating static pages</code></li>
+        <li>Pasta <code class="font-mono text-sky-300">out</code> criada na raiz do projeto</li>
+      </ul>
+      <p class="mt-3 text-sm text-red-400/90">Se der erro, leia a mensagem — geralmente é typo em algum componente ou import faltando.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 8/20 · Validar pasta <span class="text-brand-500">out/</span> e servir</h2>
+      <p class="mb-3 text-lg text-slate-300"><strong class="text-white">5.</strong> Verifique a pasta <code class="font-mono text-sky-300">out/</code>:</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <pre class="p-5 text-sm text-slate-300"><span class="text-brand-400">dir</span> out</pre>
+      </div>
+      <p class="mt-3 text-base text-slate-400">Deve existir: <code class="font-mono text-sky-300">index.html</code>, pasta <code class="font-mono text-sky-300">precos/</code>, pasta <code class="font-mono text-sky-300">contato/</code>, pasta <code class="font-mono text-sky-300">_next/</code>.</p>
+      <p class="mt-4 mb-2 text-lg text-slate-300"><strong class="text-white">6.</strong> Sirva localmente e teste:</p>
+      <div class="w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <pre class="p-5 text-sm text-slate-300"><span class="text-brand-400">npx</span> serve out</pre>
+      </div>
+      <p class="mt-3 text-base text-slate-400">Abra no navegador: <code class="font-mono text-sky-300">http://localhost:3000/fluxolab-app/</code> (troque <code class="font-mono text-sky-300">fluxolab-app</code> pelo nome do seu repo).</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 9/20 · Build no <span class="text-brand-500">Linux / macOS</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Mesma lógica do Windows — sintaxe diferente para variáveis:</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">terminal (bash/zsh)</span></div>
+        <pre class="max-h-[220px] overflow-auto p-5 text-sm text-slate-300"><span class="text-brand-400">cd</span> ~/caminho/para/fluxolab-app
+<span class="text-brand-400">GITHUB_PAGES</span>=true <span class="text-brand-400">GITHUB_REPOSITORY</span>=seu-usuario/fluxolab-app <span class="text-brand-400">npm</span> run build
+<span class="text-brand-400">ls</span> out
+<span class="text-brand-400">npx</span> serve out</pre>
+      </div>
+      <p class="mt-4 text-sm text-slate-500">URL de teste: <code class="font-mono text-sky-300">http://localhost:3000/fluxolab-app/</code></p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 10/20 · Validar build <span class="text-brand-500">localmente</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Com o <code class="font-mono text-sky-300">serve</code> rodando, clique e confira:</p>
+      <ul class="space-y-2 text-lg text-slate-400">
+        <li><i class="fa-solid fa-check text-brand-500"></i> Home carrega com CSS (não página branca sem estilo)</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Link <strong class="text-slate-300">Preços</strong> abre a página de planos</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Link <strong class="text-slate-300">Contato</strong> abre o formulário</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Ícones Font Awesome aparecem no header</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Imagem do Hero carrega</li>
+      </ul>
+      <p class="mt-4 text-sm text-slate-500">Se algo falhar aqui, corrija antes de subir pro GitHub — o erro online será o mesmo.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 11/20 · Criar repositório no <span class="text-brand-500">GitHub</span> · 1/2</h2>
+      <ol class="space-y-3 text-lg text-slate-300">
+        <li><span class="font-bold text-brand-400">1.</span> Acesse <a href="https://github.com" class="text-sky-300 underline" target="_blank" rel="noopener">github.com</a> e faça login.</li>
+        <li><span class="font-bold text-brand-400">2.</span> Clique no <strong class="text-white">+</strong> (canto superior direito) → <strong class="text-white">New repository</strong>.</li>
+        <li><span class="font-bold text-brand-400">3.</span> Em <strong class="text-white">Repository name</strong>, digite: <code class="font-mono text-sky-300">fluxolab-app</code> (ou o nome que usou no build).</li>
+        <li><span class="font-bold text-brand-400">4.</span> Deixe <strong class="text-white">Public</strong> selecionado.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 12/20 · Criar pasta do <span class="text-brand-500">workflow</span></h2>
+      <p class="mb-3 text-lg text-slate-300">No VS Code, dentro de <code class="font-mono text-sky-300">fluxolab-app</code>:</p>
+      <ol class="mt-3 space-y-2 text-base text-slate-400">
+        <li><span class="font-bold text-brand-400">1.</span> Clique com botão direito na raiz do projeto → <strong class="text-slate-300">New Folder</strong> → nome: <code class="font-mono text-sky-300">.github</code></li>
+        <li><span class="font-bold text-brand-400">2.</span> Dentro de <code class="font-mono text-sky-300">.github</code>, crie pasta <code class="font-mono text-sky-300">workflows</code></li>
+        <li><span class="font-bold text-brand-400">3.</span> Dentro de <code class="font-mono text-sky-300">workflows</code>, crie arquivo <code class="font-mono text-sky-300">deploy-pages.yml</code></li>
+      </ol>
+      <p class="mt-4 font-mono text-sm text-slate-500">fluxolab-app/.github/workflows/deploy-pages.yml</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 13/20 · Arquivo <span class="text-brand-500">deploy-pages.yml</span> completo</h2>
+      <p class="mb-3 text-lg text-slate-300">Cole <strong class="text-white">todo</strong> o conteúdo abaixo no arquivo — inclusive o job <code class="font-mono text-sky-300">deploy</code> no final:</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">.github/workflows/deploy-pages.yml</span></div>
+        <pre class="max-h-[400px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">name:</span> Deploy estático no GitHub Pages
+
+<span class="text-pink-400">on:</span>
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+<span class="text-pink-400">permissions:</span>
+  contents: read
+  pages: write
+  id-token: write
+
+<span class="text-pink-400">concurrency:</span>
+  group: pages
+  cancel-in-progress: true
+
+<span class="text-pink-400">jobs:</span>
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependências e gerar build estática
+        env:
+          GITHUB_PAGES: <span class="text-brand-400">"true"</span>
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          npm ci
+          npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment</pre>
+      </div>
+      <p class="mt-3 text-sm text-slate-500">Salve o arquivo. A linha <code class="font-mono text-sky-300">${{ github.repository }}</code> é preenchida automaticamente pelo GitHub — não troque.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 14/20 · O que o <span class="text-brand-500">workflow</span> faz</h2>
+      <ul class="space-y-3 text-base text-slate-300">
+        <li><strong class="text-white">on: push main</strong> — cada push na branch <code class="font-mono text-sky-300">main</code> dispara deploy automático.</li>
+        <li><strong class="text-white">workflow_dispatch</strong> — botão “Run workflow” manual na aba Actions.</li>
+        <li><strong class="text-white">Job build</strong> — clona repo, instala deps, roda <code class="font-mono text-sky-300">npm run build</code> com <code class="font-mono text-sky-300">GITHUB_PAGES=true</code>, envia pasta <code class="font-mono text-sky-300">out/</code>.</li>
+        <li><strong class="text-white">Job deploy</strong> — publica o artefato no GitHub Pages (só roda se build passar).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 15/20 · <span class="text-brand-500">git init</span> no projeto</h2>
+      <p class="mb-3 text-lg text-slate-300">No terminal, dentro de <code class="font-mono text-sky-300">fluxolab-app</code>:</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <pre class="p-5 text-sm text-slate-300"><span class="text-brand-400">git</span> init</pre>
+      </div>
+      <p class="mt-4 text-base text-slate-400">Resposta esperada: <code class="font-mono text-sky-300">Initialized empty Git repository...</code></p>
+      <p class="mt-2 text-sm text-slate-500">Se já tinha git antes, pode pular — ou apague a pasta <code class="font-mono text-sky-300">.git</code> só se souber o que está fazendo.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 16/20 · <span class="text-brand-500">git add</span> e commit</h2>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <pre class="max-h-[200px] overflow-auto p-5 text-sm text-slate-300"><span class="text-brand-400">git</span> add .
+<span class="text-brand-400">git</span> status
+<span class="text-brand-400">git</span> commit -m <span class="text-brand-400">"FluxoLab — landing Next.js com deploy"</span></pre>
+      </div>
+      <p class="mt-4 text-base text-slate-400">Em <code class="font-mono text-sky-300">git status</code>, confira se aparecem:</p>
+      <ul class="mt-2 text-sm text-slate-500">
+        <li><code class="font-mono text-sky-300">.github/workflows/deploy-pages.yml</code></li>
+        <li><code class="font-mono text-sky-300">next.config.ts</code></li>
+        <li><code class="font-mono text-sky-300">src/</code> (componentes e páginas)</li>
+      </ul>
+      <p class="mt-2 text-sm text-slate-500"><code class="font-mono text-sky-300">node_modules/</code> e <code class="font-mono text-sky-300">.next/</code> <strong class="text-slate-300">não</strong> devem entrar (já estão no .gitignore).</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 17/20 · Branch <span class="text-brand-500">main</span> e remote</h2>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <pre class="max-h-[180px] overflow-auto p-5 text-sm text-slate-300"><span class="text-brand-400">git</span> branch -M main
+<span class="text-brand-400">git</span> remote add origin https://github.com/SEU-USUARIO/fluxolab-app.git</pre>
+      </div>
+      <p class="mt-4 text-base text-slate-400">Troque a URL pela que você copiou no Passo 11.</p>
+      <p class="mt-2 text-sm text-amber-400/90">Se der “remote origin already exists”: <code class="font-mono text-sky-300">git remote set-url origin URL-AQUI</code></p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 18/20 · <span class="text-brand-500">git push</span> e autenticação</h2>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <pre class="p-5 text-sm text-slate-300"><span class="text-brand-400">git</span> push -u origin main</pre>
+      </div>
+      <p class="mt-4 text-base text-slate-300">O GitHub vai pedir login. Opções comuns:</p>
+      <ul class="mt-2 space-y-2 text-sm text-slate-400">
+        <li><strong class="text-slate-300">GitHub CLI:</strong> <code class="font-mono text-sky-300">gh auth login</code> antes do push</li>
+        <li><strong class="text-slate-300">HTTPS:</strong> use Personal Access Token como senha (não a senha da conta)</li>
+        <li><strong class="text-slate-300">VS Code:</strong> popup de login do GitHub ao fazer push</li>
+      </ul>
+      <p class="mt-3 text-sm text-slate-500">Sucesso: <code class="font-mono text-sky-300">branch 'main' set up to track 'origin/main'</code></p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 19/20 · Ativar <span class="text-brand-500">GitHub Pages</span> e Actions</h2>
+      <ol class="space-y-3 text-lg text-slate-300">
+        <li><strong class="text-white">1.</strong> No repositório: <strong class="text-slate-300">Settings → Pages</strong></li>
+        <li><strong class="text-white">2.</strong> Em <em>Build and deployment</em>, escolha <strong class="text-slate-300">GitHub Actions</strong> como fonte</li>
+        <li><strong class="text-white">3.</strong> Aba <strong class="text-slate-300">Actions</strong> → workflow <em>Deploy estático no GitHub Pages</em> → aguarde ficar verde</li>
+        <li><strong class="text-white">4.</strong> Volte em Pages e copie a URL publicada (<code class="font-mono text-sky-300">usuario.github.io/repo/</code>)</li>
+      </ol>
+      <p class="mt-4 text-sm text-slate-500">Erros comuns: workflow não encontrado (confira <code class="font-mono text-sky-300">.github/workflows/deploy-pages.yml</code>), build falhou (veja o log na Action), CSS ausente (confira <code class="font-mono text-sky-300">basePath</code>).</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 20/20 · Checkpoint <span class="text-brand-500">final</span></h2>
+      <ul class="space-y-4 text-lg text-slate-300">
+        <li><i class="fa-solid fa-check text-brand-500"></i> Home, Preços e Contato online com estilo e ícones.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> URL pública no formato <code class="font-mono text-sky-300">*.github.io/nome-do-repo/</code>.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Action “Deploy estático no GitHub Pages” verde na aba Actions.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Novo push na <code class="font-mono text-sky-300">main</code> republica o site automaticamente.</li>
+      </ul>
+      <p class="mt-6 text-sm text-slate-500">Parabéns — você publicou um app Next.js completo de graça no GitHub Pages.</p>
+    </div>
+  </div>
+
+  
+
+  <div class="slide-container">
+    <div class="content-area flex w-full min-h-0 grow flex-col items-center justify-center px-4 text-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Encerramento <span class="text-brand-500">do curso</span></h2>
+      <p class="mb-8 max-w-2xl text-lg text-slate-400">Com isso, você conclui os módulos de Next.js com base sólida em rotas, componentes, dados e deploy gratuito no GitHub Pages.</p>
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <a href="modulo-3-componentes-client.html" class="inline-flex items-center gap-2 rounded-xl border border-slate-600 bg-slate-800 px-6 py-3 font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-700"><i class="fa-solid fa-arrow-left"></i> Voltar ao Módulo 3</a>
+        <a href="exemplos/fluxolab-app/README.md" class="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-6 py-3 font-bold text-slate-950 transition hover:bg-brand-400">Abrir referência final <i class="fa-solid fa-rocket"></i></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

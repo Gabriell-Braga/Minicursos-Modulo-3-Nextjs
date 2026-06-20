@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <title>Módulo 3: Next.js — Componentes e client side</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 400: '#4ade80', 500: '#22c55e', 600: '#16a34a' }
+          },
+          fontFamily: {
+            sans: ['Urbanist', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="deck.css">
+</head>
+<body class="tw-slides bg-slate-950 font-sans antialiased">
+<header class="site-header fixed left-0 right-0 top-0 z-[1001] flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 bg-[#020617] px-5 py-2 font-sans" role="banner">
+  <input type="checkbox" id="site-nav-toggle" class="site-header__toggle">
+  <div class="site-header__bar">
+    <label for="site-nav-toggle" class="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-slate-700 bg-slate-900 text-brand-500">
+      <span class="visually-hidden">Abrir ou fechar menu de navegação</span>
+      <i class="fa-solid fa-bars site-header__burger-open" aria-hidden="true"></i>
+      <i class="fa-solid fa-xmark site-header__burger-close" aria-hidden="true"></i>
+    </label>
+  </div>
+  <nav class="site-header__panel" id="site-header-panel" aria-label="Navegação do curso Next.js">
+    <div class="site-header__group flex flex-wrap items-center gap-2">
+      <span class="site-header__label mr-1 text-xs font-bold uppercase tracking-widest text-slate-500">Apresentações</span>
+      <a href="modulo-1-intro-setup.html" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Módulo 1 · Intro</a>
+      <a href="modulo-2-rotas-layouts.html" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Módulo 2 · Rotas</a>
+      <a href="modulo-3-componentes-client.html" class="site-header__link pointer-events-none inline-flex items-center gap-2 rounded-xl border border-brand-500 bg-brand-500/10 px-4 py-2 text-sm font-semibold text-brand-400 transition" aria-current="page"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Módulo 3 · Componentes</a>
+      <a href="modulo-4-dados-deploy.html" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Módulo 4 · Dados</a>
+    </div>
+    <div class="site-header__group flex flex-wrap items-center gap-2">
+      <span class="site-header__label mr-1 text-xs font-bold uppercase tracking-widest text-slate-500">Projeto</span>
+      <a href="exemplos/fluxolab-app/README.md" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-file-code" aria-hidden="true"></i> README</a>
+      <a href="exemplos/fluxolab-app/" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-folder-open" aria-hidden="true"></i> Pasta</a>
+    </div>
+    <div class="site-header__group flex flex-wrap items-center gap-2">
+      <span class="site-header__label mr-1 text-xs font-bold uppercase tracking-widest text-slate-500">Links</span>
+      <a href="../Apresentação Tailwind/modulo-1-intro-setup.html" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-wind" aria-hidden="true"></i> Curso Tailwind</a>
+    </div>
+  </nav>
+  <label for="site-nav-toggle" class="site-header__backdrop"><span class="visually-hidden">Fechar menu</span></label>
+</header>
+
+<nav class="slide-controls fixed bottom-0 left-0 right-0 z-[1000] flex min-h-14 items-center justify-center gap-7 border-t border-slate-800 bg-gradient-to-t from-slate-950 via-slate-900 to-slate-950 px-6 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_rgba(0,0,0,0.35)] md:bottom-auto md:top-12 md:border-b md:border-t-0 md:bg-gradient-to-b md:from-slate-950 md:via-slate-900 md:to-slate-950 md:pb-0 md:shadow-[0_8px_24px_rgba(0,0,0,0.35)]" aria-label="Navegação da apresentação">
+  <button type="button" id="prev-slide" class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-600 bg-slate-800 text-lg text-brand-500 transition hover:border-brand-500 hover:bg-slate-700 hover:text-brand-400 disabled:cursor-not-allowed disabled:opacity-35" aria-label="Slide anterior"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+  <span id="slide-counter" class="min-w-[6rem] select-none text-center text-sm font-semibold tracking-widest text-slate-400" aria-live="polite"><span class="current text-brand-400">1</span> / <span id="slide-total">—</span></span>
+  <button type="button" id="next-slide" class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-600 bg-slate-800 text-lg text-brand-500 transition hover:border-brand-500 hover:bg-slate-700 hover:text-brand-400 disabled:cursor-not-allowed disabled:opacity-35" aria-label="Próximo slide"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+</nav>
+
+<div class="slides-deck">
+  <div class="slide-container is-active">
+    <div class="slide-fullbleed-bg flex flex-col items-center justify-center bg-cover bg-center bg-no-repeat px-4 text-center" style="background-image:linear-gradient(rgba(2,6,23,0.88),rgba(2,6,23,0.92)),url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&amp;fit=crop&amp;w=1920&amp;q=80')">
+      <p class="mb-4 text-sm font-bold uppercase tracking-[0.35em] text-brand-400">Módulo 3 · Next.js</p>
+      <h1 class="text-5xl font-extrabold uppercase leading-tight text-white sm:text-6xl md:text-7xl">Componentes &amp; <span class="text-brand-500">client</span></h1>
+      <p class="mt-8 max-w-2xl text-lg font-medium tracking-widest text-slate-400 sm:text-xl">'USE CLIENT', HOOKS E COMPOSIÇÃO DE UI</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="flex w-full grow flex-col items-center justify-center text-center">
+      <hr class="mb-6 h-2 w-36 border-0 bg-brand-500">
+      <h2 class="mb-4 text-5xl font-extrabold uppercase text-brand-500 sm:text-6xl">Foco</h2>
+      <p class="max-w-3xl text-xl text-slate-400">Separar UI em componentes e decidir quando usar Client Components.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Agenda <span class="text-brand-500">do módulo</span></h2>
+      <ul class="space-y-4 text-lg text-slate-300 md:text-xl">
+        <li><i class="fa-solid fa-check text-brand-500"></i> Server Components vs Client Components.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Diretiva <code class="font-mono text-sky-300">'use client'</code>.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Regras para hooks e interatividade.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Props tipadas e composição de blocos.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Extração para pasta <code class="font-mono text-sky-300">components/</code>.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Server Component <span class="text-brand-500">por padrão</span></h2>
+      <p class="mb-5 text-lg text-slate-300">No App Router, componentes são Server Components por padrão. Eles renderizam no servidor e enviam HTML pronto.</p>
+      <div class="rounded-xl border border-slate-700 bg-slate-900/80 p-5 text-slate-200">
+        Vantagens: menos JavaScript no cliente e melhor desempenho inicial.
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Client Component <span class="text-brand-500">quando necessário</span></h2>
+      <ul class="space-y-4 text-lg text-slate-300">
+        <li>Use para interações de navegador (menu, modal, tabs).</li>
+        <li>Necessário para hooks como <code class="font-mono text-sky-300">useState</code> e <code class="font-mono text-sky-300">useEffect</code>.</li>
+        <li>Necessário para APIs do browser (ex.: <code class="font-mono text-sky-300">window</code>, <code class="font-mono text-sky-300">localStorage</code>).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Diretiva <span class="text-brand-500">'use client'</span></h2>
+      <p class="mb-4 text-lg text-slate-300">Coloque a diretiva na primeira linha do arquivo para marcar o componente como cliente.</p>
+      <div class="rounded-xl border border-slate-700 bg-slate-900 p-5 font-mono text-sm text-slate-300">'use client';
+
+import { useState } from 'react';</div>
+      <p class="mt-4 text-sm text-slate-500">A diretiva afeta o arquivo e os imports que dependem dele.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Quando usar cada <span class="text-brand-500">tipo</span></h2>
+      <table class="w-full border-collapse text-left text-base md:text-lg">
+        <thead>
+          <tr class="border-b-2 border-slate-600">
+            <th class="p-3 text-brand-500">Server</th>
+            <th class="p-3 text-sky-400">Client</th>
+          </tr>
+        </thead>
+        <tbody class="text-slate-300">
+          <tr class="border-b border-slate-800"><td class="p-3">Markup estático e conteúdo inicial</td><td class="p-3">Estados, eventos e animação interativa</td></tr>
+          <tr class="border-b border-slate-800"><td class="p-3">Busca de dados no servidor</td><td class="p-3">Leitura de APIs do browser</td></tr>
+          <tr><td class="p-3">Menos JS enviado</td><td class="p-3">Mais controle de UX em tempo real</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Hooks só em <span class="text-brand-500">Client</span></h2>
+      <p class="mb-4 text-lg text-slate-300">Se um componente usa <code class="font-mono text-sky-300">useState</code>, ele precisa ser Client Component.</p>
+      <p class="text-base text-slate-400">Regra prática: interatividade local = <code class="font-mono text-sky-300">'use client'</code>.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Props com <span class="text-brand-500">tipagem</span></h2>
+      <p class="mb-4 text-lg text-slate-300">Defina interfaces para documentar entradas e reduzir erro em tempo de desenvolvimento.</p>
+      <div class="rounded-xl border border-slate-700 bg-slate-900 p-5 font-mono text-xs text-slate-300 md:text-sm">type FeatureCardProps = {
+  title: string;
+  description: string;
+  icon: string;
+};</div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Composição de <span class="text-brand-500">componentes</span></h2>
+      <p class="mb-4 text-lg text-slate-300">Monte páginas combinando blocos pequenos e focados em uma responsabilidade.</p>
+      <ul class="space-y-3 text-lg text-slate-300">
+        <li>Header cuida da navegação.</li>
+        <li>Hero destaca proposta principal.</li>
+        <li>Cards listam benefícios ou funcionalidades.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Pasta <span class="text-brand-500">components/</span></h2>
+      <p class="mb-4 text-lg text-slate-300">Mover componentes para <code class="font-mono text-sky-300">components/</code> facilita reuso e manutenção.</p>
+      <div class="rounded-xl border border-slate-700 bg-slate-900/80 p-6 font-mono text-sm text-slate-300">components/
+  Header.tsx
+  Hero.tsx
+  LogoStrip.tsx
+  FeatureCard.tsx</div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Organização por <span class="text-brand-500">domínio</span></h2>
+      <ul class="space-y-4 text-lg text-slate-300">
+        <li>Evite componentes gigantes com múltiplas funções.</li>
+        <li>Extraia blocos quando o markup começar a repetir.</li>
+        <li>Nomeie arquivos pelo papel visual/funcional.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Composição na <span class="text-brand-500">page.tsx</span></h2>
+      <p class="mb-4 text-lg text-slate-300">A página principal vira um orquestrador de componentes.</p>
+      <div class="rounded-xl border border-slate-700 bg-slate-900 p-5 font-mono text-xs text-slate-300 md:text-sm">&lt;main&gt;
+  &lt;Hero /&gt;
+  &lt;LogoStrip /&gt;
+  &lt;section&gt;...cards...&lt;/section&gt;
+&lt;/main&gt;</div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Checklist de <span class="text-brand-500">teoria</span></h2>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div class="rounded-xl border border-brand-500/40 bg-brand-500/10 p-5 text-slate-200">Server por padrão no App Router.</div>
+        <div class="rounded-xl border border-brand-500/40 bg-brand-500/10 p-5 text-slate-200"><code class="font-mono text-sky-300">'use client'</code> para hooks/eventos.</div>
+        <div class="rounded-xl border border-brand-500/40 bg-brand-500/10 p-5 text-slate-200">Props tipadas para contratos claros.</div>
+        <div class="rounded-xl border border-brand-500/40 bg-brand-500/10 p-5 text-slate-200">Composição para reuso e legibilidade.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="flex w-full grow flex-col items-center justify-center text-center">
+      <hr class="mb-6 h-2 w-36 border-0 bg-brand-500">
+      <h2 class="mb-4 text-5xl font-extrabold uppercase text-brand-500 sm:text-6xl">Projeto guiado</h2>
+      <p class="max-w-3xl text-xl text-slate-400">Componentes client, home completa e Footer — <strong class="text-white">20 passos</strong> guiados.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 1/20 · <span class="text-brand-500">Header</span> · client + estado</h2>
+      <p class="mb-3 text-lg text-slate-300">Interatividade exige <code class="font-mono text-sky-300">'use client'</code> e <code class="font-mono text-sky-300">useState</code> no topo do arquivo.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/components/Header.tsx (parte 1)</span></div>
+        <pre class="max-h-[220px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-brand-400">"use client"</span>;
+
+<span class="text-pink-400">import</span> Link <span class="text-pink-400">from</span> <span class="text-brand-400">"next/link"</span>;
+<span class="text-pink-400">import</span> { useState } <span class="text-pink-400">from</span> <span class="text-brand-400">"react"</span>;
+<span class="text-pink-400">import</span> { navLinks } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/lib/site"</span>;
+
+<span class="text-pink-400">export function</span> <span class="text-amber-300">Header</span>() {
+  <span class="text-pink-400">const</span> [open, setOpen] = useState(<span class="text-brand-400">false</span>);
+  <span class="text-slate-500">// JSX no próximo passo</span>
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 2/20 · <span class="text-brand-500">Header</span> · menu mobile</h2>
+      <p class="mb-3 text-lg text-slate-300">Botão hambúrguer visível só em telas pequenas (<code class="font-mono text-sky-300">md:hidden</code>).</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/components/Header.tsx (parte 2)</span></div>
+        <pre class="max-h-[280px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm">&lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"relative md:hidden"</span>&gt;
+  &lt;<span class="text-pink-400">button</span> <span class="text-amber-300">type</span>=<span class="text-brand-400">"button"</span> <span class="text-amber-300">aria-expanded</span>={open}
+    <span class="text-amber-300">onClick</span>={() =&gt; setOpen((v) =&gt; !v)}&gt;
+    &lt;<span class="text-pink-400">i</span> <span class="text-amber-300">className</span>={<span class="text-brand-400">`fa-solid ${open ? "fa-xmark" : "fa-bars"}`</span>} /&gt;
+  &lt;/<span class="text-pink-400">button</span>&gt;
+  {open ? (
+    &lt;<span class="text-pink-400">nav</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"absolute right-0 top-full z-50 rounded-xl border bg-slate-950 py-2"</span>&gt;
+      {navLinks.map((link) =&gt; (
+        &lt;<span class="text-pink-400">Link</span> <span class="text-amber-300">key</span>={link.href} <span class="text-amber-300">href</span>={link.href}
+          <span class="text-amber-300">onClick</span>={() =&gt; setOpen(<span class="text-brand-400">false</span>)}&gt;{link.label}&lt;/<span class="text-pink-400">Link</span>&gt;
+      ))}
+    &lt;/<span class="text-pink-400">nav</span>&gt;
+  ) : <span class="text-brand-400">null</span>}
+&lt;/<span class="text-pink-400">div</span>&gt;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 3/20 · <span class="text-brand-500">Header</span> · nav desktop</h2>
+      <p class="mb-3 text-lg text-slate-300">Links visíveis em telas médias+ (<code class="font-mono text-sky-300">hidden md:flex</code>) — o menu mobile fica só no celular.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/components/Header.tsx (parte 3)</span></div>
+        <pre class="max-h-[260px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm">&lt;<span class="text-pink-400">nav</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"hidden items-center gap-6 md:flex"</span> <span class="text-amber-300">aria-label</span>=<span class="text-brand-400">"Principal"</span>&gt;
+  {navLinks.map((link) =&gt; (
+    &lt;<span class="text-pink-400">Link</span> <span class="text-amber-300">key</span>={link.href} <span class="text-amber-300">href</span>={link.href}
+      <span class="text-amber-300">className</span>=<span class="text-brand-400">"rounded-md px-1 text-sm font-medium text-slate-400 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"</span>&gt;
+      {link.label}
+    &lt;/<span class="text-pink-400">Link</span>&gt;
+  ))}
+&lt;/<span class="text-pink-400">nav</span>&gt;</pre>
+      </div>
+      <p class="mt-4 text-sm text-slate-500">Monte o <code class="font-mono text-sky-300">Header.tsx</code> completo: logo + nav desktop + botão mobile no mesmo <code class="font-mono text-sky-300">return</code>.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 4/20 · <span class="text-brand-500">Hero.tsx</span> · criar arquivo</h2>
+      <p class="mb-3 text-lg text-slate-300">Crie <code class="font-mono text-sky-300">src/components/Hero.tsx</code> — a seção com grid de duas colunas envolve texto e imagem.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/components/Hero.tsx (estrutura)</span></div>
+        <pre class="max-h-[240px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">export function</span> <span class="text-amber-300">Hero</span>() {
+  <span class="text-pink-400">return</span> (
+    &lt;<span class="text-pink-400">section</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"border-b border-slate-800 bg-gradient-to-b from-slate-950 to-slate-900 py-20 sm:py-24"</span>&gt;
+      &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mx-auto grid max-w-6xl gap-12 px-4 lg:grid-cols-2 lg:items-center lg:px-8"</span>&gt;
+        <span class="text-slate-500">{/* coluna texto — próximo passo */}</span>
+        <span class="text-slate-500">{/* coluna imagem — passo 6 */}</span>
+      &lt;/<span class="text-pink-400">div</span>&gt;
+    &lt;/<span class="text-pink-400">section</span>&gt;
+  );
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 5/20 · <span class="text-brand-500">Hero</span> · texto e CTAs</h2>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/components/Hero.tsx (parte 1)</span></div>
+        <pre class="max-h-[300px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm">&lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"text-center lg:text-left"</span>&gt;
+  &lt;<span class="text-pink-400">p</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"text-sm font-semibold uppercase tracking-widest text-brand-500"</span>&gt;Minicurso Next.js&lt;/<span class="text-pink-400">p</span>&gt;
+  &lt;<span class="text-pink-400">h1</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mt-4 text-4xl font-extrabold text-white sm:text-5xl"</span>&gt;
+    Do Tailwind estático ao app React publicável.
+  &lt;/<span class="text-pink-400">h1</span>&gt;
+  &lt;<span class="text-pink-400">p</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mt-6 max-w-xl text-lg text-slate-400"</span>&gt;Mesma identidade visual do curso anterior.&lt;/<span class="text-pink-400">p</span>&gt;
+  &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mt-10 flex flex-wrap justify-center gap-4 lg:justify-start"</span>&gt;
+    &lt;<span class="text-pink-400">Link</span> <span class="text-amber-300">href</span>=<span class="text-brand-400">"/#cta"</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"rounded-full bg-brand-500 px-8 py-3.5 font-semibold text-slate-950"</span>&gt;Começar agora&lt;/<span class="text-pink-400">Link</span>&gt;
+    &lt;<span class="text-pink-400">Link</span> <span class="text-amber-300">href</span>=<span class="text-brand-400">"/precos"</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"rounded-full border border-slate-600 px-8 py-3.5 font-semibold text-slate-200"</span>&gt;Ver preços&lt;/<span class="text-pink-400">Link</span>&gt;
+  &lt;/<span class="text-pink-400">div</span>&gt;
+&lt;/<span class="text-pink-400">div</span>&gt;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 6/20 · <span class="text-brand-500">Hero</span> · next/image</h2>
+      <p class="mb-3 text-lg text-slate-300">Coluna direita com imagem otimizada via <code class="font-mono text-sky-300">next/image</code>.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/components/Hero.tsx (parte 2)</span></div>
+        <pre class="max-h-[280px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import</span> Image <span class="text-pink-400">from</span> <span class="text-brand-400">"next/image"</span>;
+<span class="text-pink-400">import</span> Link <span class="text-pink-400">from</span> <span class="text-brand-400">"next/link"</span>;
+
+&lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"overflow-hidden rounded-2xl border border-slate-800 shadow-2xl"</span>&gt;
+  &lt;<span class="text-pink-400">Image</span>
+    <span class="text-amber-300">src</span>=<span class="text-brand-400">"https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&amp;fit=crop&amp;w=900&amp;q=80"</span>
+    <span class="text-amber-300">alt</span>=<span class="text-brand-400">"Equipa a trabalhar em produto digital"</span>
+    <span class="text-amber-300">width</span>={<span class="text-brand-400">900</span>} <span class="text-amber-300">height</span>={<span class="text-brand-400">600</span>}
+    <span class="text-amber-300">className</span>=<span class="text-brand-400">"aspect-video h-full w-full object-cover"</span>
+    <span class="text-amber-300">priority</span>
+  /&gt;
+&lt;/<span class="text-pink-400">div</span>&gt;</pre>
+      </div>
+      <p class="mt-4 text-sm text-slate-500">No M4 configuramos <code class="font-mono text-sky-300">remotePatterns</code> para URLs do Unsplash no build de produção.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 7/20 · Substituir hero na <span class="text-brand-500">page.tsx</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Apague o hero inline do Módulo 1 e importe o componente <code class="font-mono text-sky-300">Hero</code>.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/app/page.tsx</span></div>
+        <pre class="max-h-[200px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import</span> { Hero } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/components/Hero"</span>;
+
+<span class="text-pink-400">export default function</span> <span class="text-amber-300">HomePage</span>() {
+  <span class="text-pink-400">return</span> &lt;<span class="text-amber-300">Hero</span> /&gt;;
+}</pre>
+      </div>
+      <p class="mt-3 text-sm text-slate-500">No próximo passo adicionamos o <code class="font-mono text-sky-300">LogoStrip</code> na mesma página.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 8/20 · <span class="text-brand-500">LogoStrip.tsx</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Componente pequeno que lê dados de <code class="font-mono text-sky-300">lib/site.ts</code> e renderiza com <code class="font-mono text-sky-300">.map()</code>.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/components/LogoStrip.tsx</span></div>
+        <pre class="max-h-[320px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import</span> { logoNames } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/lib/site"</span>;
+
+<span class="text-pink-400">export function</span> <span class="text-amber-300">LogoStrip</span>() {
+  <span class="text-pink-400">return</span> (
+    &lt;<span class="text-pink-400">section</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"border-b border-slate-800 bg-slate-950 py-12"</span> <span class="text-amber-300">aria-label</span>=<span class="text-brand-400">"Clientes"</span>&gt;
+      &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mx-auto max-w-6xl px-4 sm:px-6 lg:px-8"</span>&gt;
+        &lt;<span class="text-pink-400">p</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mb-8 text-center text-xs font-semibold uppercase tracking-widest text-slate-500"</span>&gt;
+          Confiança de equipes que estudam com você
+        &lt;/<span class="text-pink-400">p</span>&gt;
+        &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"flex flex-wrap items-center justify-center gap-x-12 gap-y-8 opacity-60 grayscale"</span>&gt;
+          {logoNames.map((name) =&gt; (
+            &lt;<span class="text-pink-400">span</span> <span class="text-amber-300">key</span>={name} <span class="text-amber-300">className</span>=<span class="text-brand-400">"text-lg font-bold text-slate-400"</span>&gt;{name}&lt;/<span class="text-pink-400">span</span>&gt;
+          ))}
+        &lt;/<span class="text-pink-400">div</span>&gt;
+      &lt;/<span class="text-pink-400">div</span>&gt;
+    &lt;/<span class="text-pink-400">section</span>&gt;
+  );
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 9/20 · Dados em <span class="text-brand-500">site.ts</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Array <code class="font-mono text-sky-300">logoNames</code> alimenta o LogoStrip via <code class="font-mono text-sky-300">.map()</code>.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/lib/site.ts</span></div>
+        <pre class="max-h-[140px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">export const</span> logoNames = [
+  <span class="text-brand-400">"Northwind"</span>, <span class="text-brand-400">"PixelForge"</span>,
+  <span class="text-brand-400">"CloudNine"</span>, <span class="text-brand-400">"StudioRua"</span>,
+] <span class="text-pink-400">as const</span>;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 10/20 · Tipo <span class="text-brand-500">Feature</span> em features.ts</h2>
+      <p class="mb-3 text-lg text-slate-300">Crie <code class="font-mono text-sky-300">src/lib/features.ts</code> só com o type — o array completo entra nos passos 13–14.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/lib/features.ts</span></div>
+        <pre class="max-h-[180px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">export type</span> <span class="text-amber-300">Feature</span> = {
+  icon: <span class="text-brand-400">string</span>;
+  title: <span class="text-brand-400">string</span>;
+  description: <span class="text-brand-400">string</span>;
+  wide?: <span class="text-brand-400">boolean</span>;
+};</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 11/20 · <span class="text-brand-500">FeatureCard.tsx</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Props tipadas com TypeScript — o card recebe um objeto <code class="font-mono text-sky-300">feature</code> e renderiza ícone, título e descrição.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/components/FeatureCard.tsx</span></div>
+        <pre class="max-h-[340px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import type</span> { Feature } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/lib/features"</span>;
+
+<span class="text-pink-400">type</span> <span class="text-amber-300">FeatureCardProps</span> = { feature: Feature };
+
+<span class="text-pink-400">export function</span> <span class="text-amber-300">FeatureCard</span>({ feature }: FeatureCardProps) {
+  <span class="text-pink-400">return</span> (
+    &lt;<span class="text-pink-400">article</span> <span class="text-amber-300">className</span>={<span class="text-brand-400">`group rounded-2xl border border-slate-800 bg-slate-900/60 p-6 transition hover:-translate-y-1 hover:border-slate-600 ${feature.wide ? "sm:col-span-2 lg:col-span-1" : ""}`</span>}&gt;
+      &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"flex h-12 w-12 items-center justify-center rounded-xl bg-brand-500/15 text-brand-400"</span>&gt;
+        &lt;<span class="text-pink-400">i</span> <span class="text-amber-300">className</span>={<span class="text-brand-400">`fa-solid ${feature.icon} text-xl`</span>} /&gt;
+      &lt;/<span class="text-pink-400">div</span>&gt;
+      &lt;<span class="text-pink-400">h3</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mt-4 text-lg font-semibold text-white"</span>&gt;{feature.title}&lt;/<span class="text-pink-400">h3</span>&gt;
+      &lt;<span class="text-pink-400">p</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mt-2 text-slate-400"</span>&gt;{feature.description}&lt;/<span class="text-pink-400">p</span>&gt;
+    &lt;/<span class="text-pink-400">article</span>&gt;
+  );
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 12/20 · Compor na <span class="text-brand-500">page.tsx</span></h2>
+      <p class="mb-3 text-lg text-slate-300">A home vira um arquivo enxuto — só imports e composição, sem markup gigante.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/app/page.tsx</span></div>
+        <pre class="max-h-[280px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import</span> { Hero } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/components/Hero"</span>;
+<span class="text-pink-400">import</span> { LogoStrip } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/components/LogoStrip"</span>;
+<span class="text-slate-500">// FeatureGrid e CtaSection nos próximos passos</span>
+
+<span class="text-pink-400">export default function</span> <span class="text-amber-300">HomePage</span>() {
+  <span class="text-pink-400">return</span> (
+    &lt;&gt;
+      &lt;<span class="text-amber-300">Hero</span> /&gt;
+      &lt;<span class="text-amber-300">LogoStrip</span> /&gt;
+    &lt;/&gt;
+  );
+}</pre>
+      </div>
+      <p class="mt-3 text-sm text-slate-500">Header continua no layout — Footer entra no passo 17. A page monta só o conteúdo da home.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 13/20 · Array <span class="text-brand-500">features</span> completo</h2>
+      <p class="mb-3 text-lg text-slate-300">Complete <code class="font-mono text-sky-300">src/lib/features.ts</code> — o type <code class="font-mono text-sky-300">Feature</code> foi criado no passo 10.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/lib/features.ts</span></div>
+        <pre class="max-h-[340px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">export const</span> features: Feature[] = [
+  {
+    icon: <span class="text-brand-400">"fa-bolt"</span>,
+    title: <span class="text-brand-400">"App Router"</span>,
+    description: <span class="text-brand-400">"Rotas baseadas em pastas — cada URL mapeia para um arquivo page.tsx."</span>,
+  },
+  {
+    icon: <span class="text-brand-400">"fa-mobile-screen"</span>,
+    title: <span class="text-brand-400">"Mobile-first"</span>,
+    description: <span class="text-brand-400">"Tailwind no Next.js com o mesmo vocabulário do minicurso anterior."</span>,
+  },
+  {
+    icon: <span class="text-brand-400">"fa-palette"</span>,
+    title: <span class="text-brand-400">"Componentes reutilizáveis"</span>,
+    description: <span class="text-brand-400">"Extrair UI em arquivos .tsx mantém layout e páginas enxutos."</span>,
+    wide: <span class="text-brand-400">true</span>,
+  },
+];</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 14/20 · <span class="text-brand-500">FeatureGrid</span></h2>
+      <p class="mb-3 text-lg text-slate-300">O grid importa o array e renderiza um <code class="font-mono text-sky-300">FeatureCard</code> por item.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/components/FeatureGrid.tsx</span></div>
+        <pre class="max-h-[340px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import</span> { features } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/lib/features"</span>;
+<span class="text-pink-400">import</span> { FeatureCard } <span class="text-pink-400">from</span> <span class="text-brand-400">"./FeatureCard"</span>;
+
+<span class="text-pink-400">export function</span> <span class="text-amber-300">FeatureGrid</span>() {
+  <span class="text-pink-400">return</span> (
+    &lt;<span class="text-pink-400">section</span> <span class="text-amber-300">id</span>=<span class="text-brand-400">"features"</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"border-b border-slate-800 bg-slate-900/40 py-20 sm:py-24"</span>&gt;
+      &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mx-auto max-w-6xl px-4 sm:px-6 lg:px-8"</span>&gt;
+        &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mx-auto max-w-2xl text-center"</span>&gt;
+          &lt;<span class="text-pink-400">h2</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"text-3xl font-bold text-white sm:text-4xl"</span>&gt;Tudo o que você precisa para shippar&lt;/<span class="text-pink-400">h2</span>&gt;
+          &lt;<span class="text-pink-400">p</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mt-4 text-lg text-slate-400"</span>&gt;Lista renderizada a partir de dados.&lt;/<span class="text-pink-400">p</span>&gt;
+        &lt;/<span class="text-pink-400">div</span>&gt;
+        &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3"</span>&gt;
+          {features.map((feature) =&gt; (
+            &lt;<span class="text-amber-300">FeatureCard</span> <span class="text-amber-300">key</span>={feature.title} <span class="text-amber-300">feature</span>={feature} /&gt;
+          ))}
+        &lt;/<span class="text-pink-400">div</span>&gt;
+      &lt;/<span class="text-pink-400">div</span>&gt;
+    &lt;/<span class="text-pink-400">section</span>&gt;
+  );
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 15/20 · <span class="text-brand-500">CtaSection</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Seção final com gradiente e formulário — ainda sem backend, só markup e estilo.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/components/CtaSection.tsx</span></div>
+        <pre class="max-h-[380px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">export function</span> <span class="text-amber-300">CtaSection</span>() {
+  <span class="text-pink-400">return</span> (
+    &lt;<span class="text-pink-400">section</span> <span class="text-amber-300">id</span>=<span class="text-brand-400">"cta"</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"py-20"</span>&gt;
+      &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mx-auto max-w-6xl px-4"</span>&gt;
+        &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"rounded-3xl bg-gradient-to-br from-brand-600 to-emerald-700 p-8 sm:p-12"</span>&gt;
+          &lt;<span class="text-pink-400">h2</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"text-center text-3xl font-extrabold text-white"</span>&gt;
+            Receba o outline do curso
+          &lt;/<span class="text-pink-400">h2</span>&gt;
+          &lt;<span class="text-pink-400">form</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mx-auto mt-10 flex max-w-md flex-col gap-3 sm:flex-row sm:items-end"</span> <span class="text-amber-300">action</span>=<span class="text-brand-400">"#"</span> <span class="text-amber-300">method</span>=<span class="text-brand-400">"post"</span>&gt;
+            &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"flex-1 text-left"</span>&gt;
+              &lt;<span class="text-pink-400">label</span> <span class="text-amber-300">htmlFor</span>=<span class="text-brand-400">"email"</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mb-1 block text-sm font-medium text-emerald-50"</span>&gt;Email&lt;/<span class="text-pink-400">label</span>&gt;
+              &lt;<span class="text-pink-400">input</span> <span class="text-amber-300">id</span>=<span class="text-brand-400">"email"</span> <span class="text-amber-300">name</span>=<span class="text-brand-400">"email"</span> <span class="text-amber-300">type</span>=<span class="text-brand-400">"email"</span> <span class="text-amber-300">autoComplete</span>=<span class="text-brand-400">"email"</span>
+                <span class="text-amber-300">placeholder</span>=<span class="text-brand-400">"voce@exemplo.com"</span>
+                <span class="text-amber-300">className</span>=<span class="text-brand-400">"w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white"</span> /&gt;
+            &lt;/<span class="text-pink-400">div</span>&gt;
+            &lt;<span class="text-pink-400">button</span> <span class="text-amber-300">type</span>=<span class="text-brand-400">"submit"</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"rounded-xl bg-slate-950 px-8 py-3 font-semibold text-white"</span>&gt;
+              Quero receber
+            &lt;/<span class="text-pink-400">button</span>&gt;
+          &lt;/<span class="text-pink-400">form</span>&gt;
+        &lt;/<span class="text-pink-400">div</span>&gt;
+      &lt;/<span class="text-pink-400">div</span>&gt;
+    &lt;/<span class="text-pink-400">section</span>&gt;
+  );
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 16/20 · Montar a <span class="text-brand-500">home</span> completa</h2>
+      <p class="mb-3 text-lg text-slate-300">A <code class="font-mono text-sky-300">page.tsx</code> final compõe os quatro blocos da landing.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/app/page.tsx</span></div>
+        <pre class="max-h-[260px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import</span> { CtaSection } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/components/CtaSection"</span>;
+<span class="text-pink-400">import</span> { FeatureGrid } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/components/FeatureGrid"</span>;
+<span class="text-pink-400">import</span> { Hero } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/components/Hero"</span>;
+<span class="text-pink-400">import</span> { LogoStrip } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/components/LogoStrip"</span>;
+
+<span class="text-pink-400">export default function</span> <span class="text-amber-300">HomePage</span>() {
+  <span class="text-pink-400">return</span> (
+    &lt;&gt;
+      &lt;<span class="text-amber-300">Hero</span> /&gt;
+      &lt;<span class="text-amber-300">LogoStrip</span> /&gt;
+      &lt;<span class="text-amber-300">FeatureGrid</span> /&gt;
+      &lt;<span class="text-amber-300">CtaSection</span> /&gt;
+    &lt;/&gt;
+  );
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 17/20 · <span class="text-brand-500">Footer</span> no layout</h2>
+      <p class="mb-3 text-lg text-slate-300">Importe o Footer no layout — fecha todas as páginas com consistência.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/app/layout.tsx</span></div>
+        <pre class="max-h-[200px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import</span> { Footer } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/components/Footer"</span>;
+
+&lt;<span class="text-pink-400">body</span>&gt;
+  &lt;<span class="text-amber-300">Header</span> /&gt;
+  &lt;<span class="text-pink-400">main</span>&gt;{children}&lt;/<span class="text-pink-400">main</span>&gt;
+  &lt;<span class="text-amber-300">Footer</span> /&gt;
+&lt;/<span class="text-pink-400">body</span>&gt;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 18/20 · Componente <span class="text-brand-500">Footer.tsx</span> · estrutura</h2>
+      <p class="mb-3 text-lg text-slate-300">Grid de 4 colunas com marca, links do curso e documentação externa.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/components/Footer.tsx (parte 1)</span></div>
+        <pre class="max-h-[300px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import</span> Link <span class="text-pink-400">from</span> <span class="text-brand-400">"next/link"</span>;
+
+&lt;<span class="text-pink-400">footer</span> <span class="text-amber-300">id</span>=<span class="text-brand-400">"footer"</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"border-t border-slate-800 bg-slate-950 py-12"</span>&gt;
+  &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mx-auto grid max-w-6xl gap-10 px-4 md:grid-cols-4 lg:px-8"</span>&gt;
+    &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"md:col-span-2"</span>&gt;
+      &lt;<span class="text-pink-400">p</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"text-lg font-bold text-white"</span>&gt;Fluxo&lt;<span class="text-pink-400">span</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"text-brand-500"</span>&gt;Lab&lt;/<span class="text-pink-400">span</span>&gt;&lt;/<span class="text-pink-400">p</span>&gt;
+      &lt;<span class="text-pink-400">p</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mt-3 max-w-sm text-sm text-slate-400"</span>&gt;App de exemplo para o minicurso Next.js.&lt;/<span class="text-pink-400">p</span>&gt;
+    &lt;/<span class="text-pink-400">div</span>&gt;
+    <span class="text-slate-500">{/* colunas Curso e Base — próximo passo */}</span>
+  &lt;/<span class="text-pink-400">div</span>&gt;
+&lt;/<span class="text-pink-400">footer</span>&gt;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 19/20 · <span class="text-brand-500">Footer.tsx</span> · links e copyright</h2>
+      <p class="mb-3 text-lg text-slate-300">Complete as colunas de navegação e o rodapé com copyright.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/components/Footer.tsx (parte 2)</span></div>
+        <pre class="max-h-[320px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm">&lt;<span class="text-pink-400">div</span>&gt;
+  &lt;<span class="text-pink-400">p</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"text-xs font-semibold uppercase text-slate-500"</span>&gt;Curso&lt;/<span class="text-pink-400">p</span>&gt;
+  &lt;<span class="text-pink-400">ul</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mt-4 space-y-2 text-sm text-slate-400"</span>&gt;
+    &lt;<span class="text-pink-400">li</span>&gt;&lt;<span class="text-pink-400">Link</span> <span class="text-amber-300">href</span>=<span class="text-brand-400">"/"</span>&gt;Início&lt;/<span class="text-pink-400">Link</span>&gt;&lt;/<span class="text-pink-400">li</span>&gt;
+    &lt;<span class="text-pink-400">li</span>&gt;&lt;<span class="text-pink-400">Link</span> <span class="text-amber-300">href</span>=<span class="text-brand-400">"/precos"</span>&gt;Preços&lt;/<span class="text-pink-400">Link</span>&gt;&lt;/<span class="text-pink-400">li</span>&gt;
+    &lt;<span class="text-pink-400">li</span>&gt;&lt;<span class="text-pink-400">Link</span> <span class="text-amber-300">href</span>=<span class="text-brand-400">"/contato"</span>&gt;Contato&lt;/<span class="text-pink-400">Link</span>&gt;&lt;/<span class="text-pink-400">li</span>&gt;
+  &lt;/<span class="text-pink-400">ul</span>&gt;
+&lt;/<span class="text-pink-400">div</span>&gt;
+&lt;<span class="text-pink-400">p</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mx-auto mt-12 max-w-6xl px-4 text-center text-xs text-slate-600"</span>&gt;
+  © 2026 Minicurso Next.js — uso educacional.
+&lt;/<span class="text-pink-400">p</span>&gt;</pre>
+      </div>
+    </div>
+  </div>
+
+    <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 20/20 · Checkpoint <span class="text-brand-500">M3</span></h2>
+      <ul class="space-y-4 text-lg text-slate-300">
+        <li><i class="fa-solid fa-check text-brand-500"></i> Header client com nav desktop e menu mobile.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Home completa: Hero, LogoStrip, FeatureGrid e CtaSection.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Footer persistente no layout com links do curso.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Dados em <code class="font-mono text-sky-300">features.ts</code> alimentando componentes.</li>
+      </ul>
+    </div>
+  </div>
+
+  
+
+  <div class="slide-container">
+    <div class="content-area flex w-full min-h-0 grow flex-col items-center justify-center px-4 text-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Navegação <span class="text-brand-500">entre módulos</span></h2>
+      <p class="mb-8 max-w-2xl text-lg text-slate-400">Módulo 3 concluído. No próximo módulo, publicamos o projeto no GitHub Pages.</p>
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <a href="modulo-2-rotas-layouts.html" class="inline-flex items-center gap-2 rounded-xl border border-slate-600 bg-slate-800 px-6 py-3 font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-700"><i class="fa-solid fa-arrow-left"></i> Voltar ao Módulo 2</a>
+        <a href="modulo-4-dados-deploy.html" class="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-6 py-3 font-bold text-slate-950 transition hover:bg-brand-400">Abrir Módulo 4 <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+  </div></div>
+
+<script src="script.js"></script>
+</body>
+</html>

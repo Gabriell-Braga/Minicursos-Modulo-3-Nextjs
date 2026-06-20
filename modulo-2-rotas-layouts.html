@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <title>Módulo 2: Next.js — Rotas e layouts</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 400: '#4ade80', 500: '#22c55e', 600: '#16a34a' }
+          },
+          fontFamily: {
+            sans: ['Urbanist', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="deck.css">
+</head>
+<body class="tw-slides bg-slate-950 font-sans antialiased">
+<header class="site-header fixed left-0 right-0 top-0 z-[1001] flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 bg-[#020617] px-5 py-2 font-sans" role="banner">
+  <input type="checkbox" id="site-nav-toggle" class="site-header__toggle">
+  <div class="site-header__bar">
+    <label for="site-nav-toggle" class="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-slate-700 bg-slate-900 text-brand-500">
+      <span class="visually-hidden">Abrir ou fechar menu de navegação</span>
+      <i class="fa-solid fa-bars site-header__burger-open" aria-hidden="true"></i>
+      <i class="fa-solid fa-xmark site-header__burger-close" aria-hidden="true"></i>
+    </label>
+  </div>
+  <nav class="site-header__panel" id="site-header-panel" aria-label="Navegação do curso Next.js">
+    <div class="site-header__group flex flex-wrap items-center gap-2">
+      <span class="site-header__label mr-1 text-xs font-bold uppercase tracking-widest text-slate-500">Apresentações</span>
+      <a href="modulo-1-intro-setup.html" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Módulo 1 · Intro</a>
+      <a href="modulo-2-rotas-layouts.html" class="site-header__link pointer-events-none inline-flex items-center gap-2 rounded-xl border border-brand-500 bg-brand-500/10 px-4 py-2 text-sm font-semibold text-brand-400 transition" aria-current="page"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Módulo 2 · Rotas</a>
+      <a href="modulo-3-componentes-client.html" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Módulo 3 · Componentes</a>
+      <a href="modulo-4-dados-deploy.html" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> Módulo 4 · Dados</a>
+    </div>
+    <div class="site-header__group flex flex-wrap items-center gap-2">
+      <span class="site-header__label mr-1 text-xs font-bold uppercase tracking-widest text-slate-500">Projeto</span>
+      <a href="exemplos/fluxolab-app/README.md" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-file-code" aria-hidden="true"></i> README</a>
+      <a href="exemplos/fluxolab-app/" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-folder-open" aria-hidden="true"></i> Pasta</a>
+    </div>
+    <div class="site-header__group flex flex-wrap items-center gap-2">
+      <span class="site-header__label mr-1 text-xs font-bold uppercase tracking-widest text-slate-500">Links</span>
+      <a href="../Apresentação Tailwind/modulo-1-intro-setup.html" class="site-header__link inline-flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-400 transition hover:border-slate-600 hover:bg-slate-800 hover:text-slate-200"><i class="fa-solid fa-wind" aria-hidden="true"></i> Curso Tailwind</a>
+    </div>
+  </nav>
+  <label for="site-nav-toggle" class="site-header__backdrop"><span class="visually-hidden">Fechar menu</span></label>
+</header>
+
+<nav class="slide-controls fixed bottom-0 left-0 right-0 z-[1000] flex min-h-14 items-center justify-center gap-7 border-t border-slate-800 bg-gradient-to-t from-slate-950 via-slate-900 to-slate-950 px-6 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_24px_rgba(0,0,0,0.35)] md:bottom-auto md:top-12 md:border-b md:border-t-0 md:bg-gradient-to-b md:from-slate-950 md:via-slate-900 md:to-slate-950 md:pb-0 md:shadow-[0_8px_24px_rgba(0,0,0,0.35)]" aria-label="Navegação da apresentação">
+  <button type="button" id="prev-slide" class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-600 bg-slate-800 text-lg text-brand-500 transition hover:border-brand-500 hover:bg-slate-700 hover:text-brand-400 disabled:cursor-not-allowed disabled:opacity-35" aria-label="Slide anterior"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button>
+  <span id="slide-counter" class="min-w-[6rem] select-none text-center text-sm font-semibold tracking-widest text-slate-400" aria-live="polite"><span class="current text-brand-400">1</span> / <span id="slide-total">—</span></span>
+  <button type="button" id="next-slide" class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-slate-600 bg-slate-800 text-lg text-brand-500 transition hover:border-brand-500 hover:bg-slate-700 hover:text-brand-400 disabled:cursor-not-allowed disabled:opacity-35" aria-label="Próximo slide"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+</nav>
+
+<div class="slides-deck">
+  <div class="slide-container is-active">
+    <div class="slide-fullbleed-bg flex flex-col items-center justify-center bg-cover bg-center bg-no-repeat px-4 text-center" style="background-image:linear-gradient(rgba(2,6,23,0.88),rgba(2,6,23,0.92)),url('https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?auto=format&amp;fit=crop&amp;w=1920&amp;q=80')">
+      <p class="mb-4 text-sm font-bold uppercase tracking-[0.35em] text-brand-400">Módulo 2 · Next.js</p>
+      <h1 class="text-5xl font-extrabold uppercase leading-tight text-white sm:text-6xl md:text-7xl">Rotas &amp; <span class="text-brand-500">layouts</span></h1>
+      <p class="mt-8 max-w-2xl text-lg font-medium tracking-widest text-slate-400 sm:text-xl">FILE-BASED ROUTING, LINK E PÁGINAS ANINHADAS</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="flex w-full grow flex-col items-center justify-center text-center">
+      <hr class="mb-6 h-2 w-36 border-0 bg-brand-500">
+      <h2 class="mb-4 text-5xl font-extrabold uppercase text-brand-500 sm:text-6xl">Objetivos</h2>
+      <p class="max-w-3xl text-xl text-slate-400">Entender o roteamento por arquivos e estruturar layouts reutilizáveis.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Agenda <span class="text-brand-500">do módulo</span></h2>
+      <ul class="space-y-4 text-lg text-slate-300 md:text-xl">
+        <li><i class="fa-solid fa-check text-brand-500"></i> File-based routing no App Router.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Pastas aninhadas e páginas.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> <code class="font-mono text-sky-300">layout.tsx</code> envolvendo <code class="font-mono text-sky-300">children</code>.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Diferença entre <code class="font-mono text-sky-300">Link</code> e <code class="font-mono text-sky-300">&lt;a&gt;</code>.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Metadados por página, route groups e 404.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">File-based <span class="text-brand-500">routing</span></h2>
+      <p class="mb-5 text-lg text-slate-300">No Next.js, cada pasta dentro de <code class="font-mono text-sky-300">app/</code> representa um segmento de URL. A presença de <code class="font-mono text-sky-300">page.tsx</code> cria uma rota acessível.</p>
+      <div class="rounded-xl border border-slate-700 bg-slate-900/80 p-6">
+        <p class="text-sm text-slate-400">Mental model:</p>
+        <p class="mt-2 text-lg text-white"><code class="font-mono text-brand-400">app/sobre/page.tsx</code> → <code class="font-mono text-sky-300">/sobre</code></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Estrutura <span class="text-brand-500">mínima</span></h2>
+      <div class="w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">app/</span></div>
+        <pre class="max-h-[360px] overflow-auto p-5 text-sm leading-relaxed text-slate-300">app/
+  layout.tsx
+  page.tsx
+  sobre/
+    page.tsx
+  contato/
+    page.tsx</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Pastas <span class="text-brand-500">aninhadas</span></h2>
+      <p class="mb-4 text-lg text-slate-300">Subpastas criam segmentos encadeados:</p>
+      <p class="text-xl text-white"><code class="font-mono text-brand-400">app/blog/post/page.tsx</code> → <code class="font-mono text-sky-300">/blog/post</code></p>
+      <p class="mt-6 text-base text-slate-400">Isso torna a estrutura de arquivos previsível para toda a equipa.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Rotas dinâmicas <span class="text-brand-500">(visão rápida)</span></h2>
+      <p class="mb-4 text-lg text-slate-300">Nomes entre colchetes capturam parâmetros de URL.</p>
+      <div class="rounded-xl border border-slate-700 bg-slate-900/80 p-6 font-mono text-sm text-slate-300">
+        <p><span class="text-brand-400">app/produtos/[id]/page.tsx</span></p>
+        <p class="mt-2">A rota <span class="text-sky-300">/produtos/42</span> injeta <code class="text-sky-300">params.id = "42"</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl"><code class="font-mono">layout.tsx</code> e <span class="text-brand-500">children</span></h2>
+      <p class="mb-4 text-lg text-slate-300">Layouts envolvem as páginas do segmento e evitam repetição de estrutura comum.</p>
+      <div class="w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <pre class="max-h-[360px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm">export default function RootLayout({ children }: {
+  children: React.ReactNode
+}) {
+  return (
+    &lt;html lang="pt-BR"&gt;
+      &lt;body&gt;
+        &lt;Header /&gt;
+        {children}
+      &lt;/body&gt;
+    &lt;/html&gt;
+  );
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Root layout vs <span class="text-brand-500">layout de segmento</span></h2>
+      <ul class="space-y-4 text-lg text-slate-300">
+        <li><strong class="text-white">Root layout</strong>: obrigatório em <code class="font-mono text-sky-300">app/layout.tsx</code>.</li>
+        <li><strong class="text-white">Layouts internos</strong>: opcionais em subpastas para secções específicas.</li>
+        <li><strong class="text-white">Composição</strong>: um layout interno é renderizado dentro do root.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl"><code class="font-mono">Link</code> vs <span class="text-brand-500">&lt;a&gt;</span></h2>
+      <table class="w-full border-collapse text-left text-base md:text-lg">
+        <thead>
+          <tr class="border-b-2 border-slate-600">
+            <th class="p-3 text-brand-500">next/link</th>
+            <th class="p-3 text-sky-400">&lt;a&gt; tradicional</th>
+          </tr>
+        </thead>
+        <tbody class="text-slate-300">
+          <tr class="border-b border-slate-800"><td class="p-3">Navegação de app sem recarregar página inteira</td><td class="p-3">Pode causar reload completo</td></tr>
+          <tr class="border-b border-slate-800"><td class="p-3">Prefetch automático em várias situações</td><td class="p-3">Sem prefetch embutido</td></tr>
+          <tr><td class="p-3">Ideal para rotas internas</td><td class="p-3">Útil para links externos e downloads</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Metadata <span class="text-brand-500">por página</span></h2>
+      <p class="mb-4 text-lg text-slate-300">Cada rota pode exportar metadados para título e descrição da aba.</p>
+      <div class="rounded-xl border border-slate-700 bg-slate-900 p-6 font-mono text-sm text-slate-300">
+        <p>export const metadata = {</p>
+        <p class="pl-4">title: 'Contato',</p>
+        <p class="pl-4">description: 'Fale com nossa equipa'</p>
+        <p>};</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Route groups <span class="text-brand-500">(breve)</span></h2>
+      <p class="mb-4 text-lg text-slate-300">Pastas com parênteses organizam arquivos sem alterar a URL pública.</p>
+      <p class="text-lg text-slate-200"><code class="font-mono text-brand-400">app/(marketing)/sobre/page.tsx</code> continua em <code class="font-mono text-sky-300">/sobre</code>.</p>
+      <p class="mt-5 text-sm text-slate-500">Use para separar áreas (marketing, dashboard, auth) sem poluir o caminho.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Conceito de <span class="text-brand-500">404</span></h2>
+      <ul class="space-y-4 text-lg text-slate-300">
+        <li>Rotas inexistentes mostram página de não encontrado.</li>
+        <li>Você pode personalizar com <code class="font-mono text-sky-300">app/not-found.tsx</code>.</li>
+        <li>Ajuda usuário e SEO com feedback claro de URL inválida.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Boas práticas de <span class="text-brand-500">rotas</span></h2>
+      <ul class="space-y-3 text-lg text-slate-300">
+        <li>Nomeie pastas com semântica de negócio, não de componente.</li>
+        <li>Mantenha o root layout enxuto e reutilizável.</li>
+        <li>Centralize links de navegação para evitar divergência.</li>
+        <li>Pense em metadados desde o início do módulo.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Checklist de <span class="text-brand-500">teoria</span></h2>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div class="rounded-xl border border-brand-500/40 bg-brand-500/10 p-5 text-slate-200">Rota nasce de <code class="font-mono text-sky-300">page.tsx</code>.</div>
+        <div class="rounded-xl border border-brand-500/40 bg-brand-500/10 p-5 text-slate-200"><code class="font-mono text-sky-300">layout.tsx</code> recebe <code class="font-mono text-sky-300">children</code>.</div>
+        <div class="rounded-xl border border-brand-500/40 bg-brand-500/10 p-5 text-slate-200">Use <code class="font-mono text-sky-300">Link</code> em navegação interna.</div>
+        <div class="rounded-xl border border-brand-500/40 bg-brand-500/10 p-5 text-slate-200">Metadata por rota melhora contexto e SEO.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="flex w-full grow flex-col items-center justify-center text-center">
+      <hr class="mb-6 h-2 w-36 border-0 bg-brand-500">
+      <h2 class="mb-4 text-5xl font-extrabold uppercase text-brand-500 sm:text-6xl">Projeto guiado</h2>
+      <p class="max-w-3xl text-xl text-slate-400">Rotas, páginas de preços e contato — <strong class="text-white">20 passos</strong> guiados.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 1/20 · Criar <span class="text-brand-500">Header.tsx</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Primeiro o componente de cabeçalho — no próximo passo ele entra no layout.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/components/Header.tsx</span></div>
+        <pre class="max-h-[260px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import</span> Link <span class="text-pink-400">from</span> <span class="text-brand-400">"next/link"</span>;
+
+<span class="text-pink-400">export function</span> <span class="text-amber-300">Header</span>() {
+  <span class="text-pink-400">return</span> (
+    &lt;<span class="text-pink-400">header</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"border-b border-slate-800 bg-slate-950/90"</span>&gt;
+      &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mx-auto flex max-w-6xl items-center justify-between px-4 py-4"</span>&gt;
+        &lt;<span class="text-pink-400">Link</span> <span class="text-amber-300">href</span>=<span class="text-brand-400">"/"</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"text-lg font-bold text-white"</span>&gt;
+          Fluxo&lt;<span class="text-pink-400">span</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"text-brand-500"</span>&gt;Lab&lt;/<span class="text-pink-400">span</span>&gt;
+        &lt;/<span class="text-pink-400">Link</span>&gt;
+        &lt;<span class="text-pink-400">nav</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"flex gap-6"</span>&gt;{<span class="text-slate-500">/* links no passo 7 */</span>}&lt;/<span class="text-pink-400">nav</span>&gt;
+      &lt;/<span class="text-pink-400">div</span>&gt;
+    &lt;/<span class="text-pink-400">header</span>&gt;
+  );
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 2/20 · Header no <span class="text-brand-500">layout</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Importe o Header no layout — assim ele aparece em <strong class="text-white">todas</strong> as rotas.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/app/layout.tsx</span></div>
+        <pre class="max-h-[220px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import</span> { Header } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/components/Header"</span>;
+
+<span class="text-pink-400">export default function</span> <span class="text-amber-300">RootLayout</span>({ children }) {
+  <span class="text-pink-400">return</span> (
+    &lt;<span class="text-pink-400">html</span> <span class="text-amber-300">lang</span>=<span class="text-brand-400">"pt-br"</span>&gt;
+      &lt;<span class="text-pink-400">body</span>&gt;
+        &lt;<span class="text-amber-300">Header</span> /&gt;
+        &lt;<span class="text-pink-400">main</span>&gt;{children}&lt;/<span class="text-pink-400">main</span>&gt;
+      &lt;/<span class="text-pink-400">body</span>&gt;
+    &lt;/<span class="text-pink-400">html</span>&gt;
+  );
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 3/20 · Criar rota <span class="text-brand-500">/precos</span></h2>
+      <p class="mb-3 text-lg text-slate-300">No App Router, cada pasta com <code class="font-mono text-sky-300">page.tsx</code> vira uma URL. Crie a estrutura abaixo:</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/app/precos/page.tsx</span></div>
+        <pre class="max-h-[340px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import</span> Link <span class="text-pink-400">from</span> <span class="text-brand-400">"next/link"</span>;
+
+<span class="text-pink-400">export default function</span> <span class="text-amber-300">PrecosPage</span>() {
+  <span class="text-pink-400">return</span> (
+    &lt;<span class="text-pink-400">section</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"border-b border-slate-800 py-20"</span>&gt;
+      &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mx-auto max-w-3xl px-4 text-center"</span>&gt;
+        &lt;<span class="text-pink-400">p</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"text-sm font-semibold uppercase tracking-widest text-brand-500"</span>&gt;
+          Preços
+        &lt;/<span class="text-pink-400">p</span>&gt;
+        &lt;<span class="text-pink-400">h1</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mt-4 text-4xl font-extrabold text-white"</span>&gt;
+          Uma rota a mais, zero configuração extra.
+        &lt;/<span class="text-pink-400">h1</span>&gt;
+        &lt;<span class="text-pink-400">p</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mt-6 text-lg text-slate-400"</span>&gt;
+          Este conteúdo vive em &lt;<span class="text-pink-400">code</span>&gt;app/precos/page.tsx&lt;/<span class="text-pink-400">code</span>&gt;.
+        &lt;/<span class="text-pink-400">p</span>&gt;
+        &lt;<span class="text-pink-400">Link</span> <span class="text-amber-300">href</span>=<span class="text-brand-400">"/"</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mt-10 inline-flex rounded-full border border-slate-600 px-8 py-3 text-slate-200"</span>&gt;
+          Voltar ao início
+        &lt;/<span class="text-pink-400">Link</span>&gt;
+      &lt;/<span class="text-pink-400">div</span>&gt;
+    &lt;/<span class="text-pink-400">section</span>&gt;
+  );
+}</pre>
+      </div>
+      <p class="mt-3 text-sm text-slate-500">Acesse <code class="font-mono text-sky-300">http://localhost:3000/precos</code> após salvar.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 4/20 · Rota <span class="text-brand-500">/contato</span> · placeholder</h2>
+      <p class="mb-3 text-lg text-slate-300">Nova pasta com título e formulário estático simples — será reescrita nos passos 17–20.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/app/contato/page.tsx</span></div>
+        <pre class="max-h-[300px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import</span> Link <span class="text-pink-400">from</span> <span class="text-brand-400">"next/link"</span>;
+
+<span class="text-pink-400">export default function</span> <span class="text-amber-300">ContatoPage</span>() {
+  <span class="text-pink-400">return</span> (
+    &lt;<span class="text-pink-400">section</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"py-20"</span>&gt;
+      &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mx-auto max-w-xl px-4"</span>&gt;
+        &lt;<span class="text-pink-400">h1</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"text-4xl font-extrabold text-white"</span>&gt;Contato&lt;/<span class="text-pink-400">h1</span>&gt;
+        &lt;<span class="text-pink-400">form</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mt-10 space-y-4"</span> <span class="text-amber-300">action</span>=<span class="text-brand-400">"#"</span>&gt;
+          &lt;<span class="text-pink-400">input</span> <span class="text-amber-300">name</span>=<span class="text-brand-400">"nome"</span> <span class="text-amber-300">placeholder</span>=<span class="text-brand-400">"Nome"</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-white"</span> /&gt;
+          &lt;<span class="text-pink-400">button</span> <span class="text-amber-300">type</span>=<span class="text-brand-400">"submit"</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"rounded-full bg-brand-500 px-8 py-3 font-semibold text-slate-950"</span>&gt;Enviar&lt;/<span class="text-pink-400">button</span>&gt;
+        &lt;/<span class="text-pink-400">form</span>&gt;
+        &lt;<span class="text-pink-400">Link</span> <span class="text-amber-300">href</span>=<span class="text-brand-400">"/"</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mt-8 block text-center text-brand-400"</span>&gt;← Início&lt;/<span class="text-pink-400">Link</span>&gt;
+      &lt;/<span class="text-pink-400">div</span>&gt;
+    &lt;/<span class="text-pink-400">section</span>&gt;
+  );
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 5/20 · Trocar <span class="text-brand-500">âncoras por Link</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Substitua <code class="font-mono text-sky-300">&lt;a href&gt;</code> por <code class="font-mono text-sky-300">&lt;Link&gt;</code> — navegação client-side sem recarregar a página inteira.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/components/Header.tsx</span></div>
+        <pre class="max-h-[300px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import</span> Link <span class="text-pink-400">from</span> <span class="text-brand-400">"next/link"</span>;
+<span class="text-pink-400">import</span> { navLinks } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/lib/site"</span>;
+
+<span class="text-slate-500">{/* Dentro do &lt;nav&gt;: */}</span>
+{navLinks.map((link) =&gt; (
+  &lt;<span class="text-pink-400">Link</span>
+    <span class="text-amber-300">key</span>={link.href}
+    <span class="text-amber-300">href</span>={link.href}
+    <span class="text-amber-300">className</span>=<span class="text-brand-400">"text-sm font-medium text-slate-400 hover:text-white"</span>
+  &gt;
+    {link.label}
+  &lt;/<span class="text-pink-400">Link</span>&gt;
+))}
+
+<span class="text-slate-500">{/* ❌ Evite para rotas internas: */}</span>
+<span class="text-slate-600">&lt;a href="/precos"&gt;Preços&lt;/a&gt;</span>
+<span class="text-slate-500">{/* ✅ Prefira: */}</span>
+<span class="text-brand-400">&lt;Link href="/precos"&gt;Preços&lt;/Link&gt;</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 6/20 · <code class="font-mono">lib/site.ts</code> com <span class="text-brand-500">navLinks</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Centralize os links num array — alterar a navegação fica em um único arquivo.</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/lib/site.ts</span></div>
+        <pre class="max-h-[260px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">export const</span> navLinks = [
+  { href: <span class="text-brand-400">"/#features"</span>, label: <span class="text-brand-400">"Funcionalidades"</span> },
+  { href: <span class="text-brand-400">"/precos"</span>, label: <span class="text-brand-400">"Preços"</span> },
+  { href: <span class="text-brand-400">"/contato"</span>, label: <span class="text-brand-400">"Contato"</span> },
+] <span class="text-pink-400">as const</span>;
+
+<span class="text-slate-500">// O Header importa e renderiza:</span>
+<span class="text-slate-500">// navLinks.map((link) =&gt; &lt;Link key={link.href} ...&gt;)</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 7/20 · Metadata nas <span class="text-brand-500">novas páginas</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Exporte <code class="font-mono text-sky-300">metadata</code> no topo de cada rota — o título da aba muda automaticamente.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="h-3 w-3 rounded-full bg-red-500"></span><span class="h-3 w-3 rounded-full bg-yellow-500"></span><span class="h-3 w-3 rounded-full bg-green-500"></span><span class="ml-2 text-xs text-slate-500">src/app/precos/page.tsx</span></div>
+        <pre class="max-h-[200px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import type</span> { Metadata } <span class="text-pink-400">from</span> <span class="text-brand-400">"next"</span>;
+
+<span class="text-pink-400">export const</span> metadata: Metadata = {
+  title: <span class="text-brand-400">"Preços"</span>,
+  description: <span class="text-brand-400">"Planos do FluxoLab."</span>,
+};</pre>
+      </div>
+      <p class="mt-4 text-sm text-slate-500">Repita o mesmo padrão em <code class="font-mono text-sky-300">app/contato/page.tsx</code> com <code class="font-mono text-sky-300">title: "Contato"</code>.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 8/20 · Template de título no <span class="text-brand-500">layout</span></h2>
+      <p class="mb-3 text-lg text-slate-300">No layout raiz, use <code class="font-mono text-sky-300">template</code> para sufixar o nome do site em todas as páginas.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/app/layout.tsx</span></div>
+        <pre class="max-h-[200px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">export const</span> metadata = {
+  title: {
+    default: <span class="text-brand-400">"FluxoLab · Minicurso Next.js"</span>,
+    template: <span class="text-brand-400">"%s · FluxoLab"</span>,  <span class="text-slate-500">// → "Preços · FluxoLab"</span>
+  },
+};</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="flex w-full grow flex-col items-center justify-center text-center">
+      <hr class="mb-6 h-2 w-36 border-0 bg-brand-500">
+      <h2 class="mb-4 text-4xl font-extrabold uppercase text-brand-500 sm:text-5xl">Página de Preços</h2>
+      <p class="max-w-3xl text-xl text-slate-400">Evolua os placeholders de /precos (passo 3) e /contato (passo 4) com planos, tabela, FAQ e formulário interativo.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 9/20 · Tipo <span class="text-brand-500">Plan</span> em pricing.ts</h2>
+      <p class="mb-3 text-lg text-slate-300">Crie <code class="font-mono text-sky-300">src/lib/pricing.ts</code> com o contrato de cada plano.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/lib/pricing.ts (parte 1)</span></div>
+        <pre class="max-h-[260px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">export type</span> <span class="text-amber-300">Plan</span> = {
+  id: <span class="text-brand-400">string</span>;
+  name: <span class="text-brand-400">string</span>;
+  description: <span class="text-brand-400">string</span>;
+  monthlyPrice: <span class="text-brand-400">number | null</span>;
+  icon: <span class="text-brand-400">string</span>;
+  features: <span class="text-brand-400">string[]</span>;
+  missing?: <span class="text-brand-400">string[]</span>;
+  highlighted?: <span class="text-brand-400">boolean</span>;
+  cta: <span class="text-brand-400">string</span>;
+  ctaHref: <span class="text-brand-400">string</span>;
+};</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 10/20 · Array <span class="text-brand-500">plans</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Três tiers: Starter (grátis), Pro (destaque) e Enterprise (sob consulta).</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/lib/pricing.ts (parte 2)</span></div>
+        <pre class="max-h-[340px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">export const</span> plans: Plan[] = [
+  {
+    id: <span class="text-brand-400">"starter"</span>, name: <span class="text-brand-400">"Starter"</span>,
+    description: <span class="text-brand-400">"Ideal para experimentar deploy e rotas."</span>,
+    monthlyPrice: <span class="text-brand-400">0</span>, icon: <span class="text-brand-400">"fa-seedling"</span>,
+    features: [<span class="text-brand-400">"1 projeto ativo"</span>, <span class="text-brand-400">"Deploy no GitHub Pages"</span>],
+    missing: [<span class="text-brand-400">"Domínio personalizado"</span>],
+    cta: <span class="text-brand-400">"Começar grátis"</span>, ctaHref: <span class="text-brand-400">"/"</span>,
+  },
+  {
+    id: <span class="text-brand-400">"pro"</span>, name: <span class="text-brand-400">"Pro"</span>,
+    monthlyPrice: <span class="text-brand-400">49</span>, icon: <span class="text-brand-400">"fa-rocket"</span>,
+    highlighted: <span class="text-brand-400">true</span>,
+    features: [<span class="text-brand-400">"Projetos ilimitados"</span>, <span class="text-brand-400">"Suporte prioritário"</span>],
+    cta: <span class="text-brand-400">"Assinar Pro"</span>, ctaHref: <span class="text-brand-400">"/contato"</span>,
+  },
+  {
+    id: <span class="text-brand-400">"enterprise"</span>, name: <span class="text-brand-400">"Enterprise"</span>,
+    monthlyPrice: <span class="text-brand-400">null</span>, icon: <span class="text-brand-400">"fa-building"</span>,
+    features: [<span class="text-brand-400">"SSO &amp; SAML"</span>, <span class="text-brand-400">"SLA 99,9%"</span>],
+    cta: <span class="text-brand-400">"Falar com vendas"</span>, ctaHref: <span class="text-brand-400">"/contato"</span>,
+  },
+];</pre>
+      </div>
+      <p class="mt-3 text-sm text-slate-500">Copie as descriptions e features completas do slide seguinte se quiser o texto idêntico ao app final.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 11/20 · <span class="text-brand-500">comparisonRows</span> e FAQ</h2>
+      <p class="mb-3 text-lg text-slate-300">Dados da tabela comparativa e perguntas frequentes no mesmo arquivo.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/lib/pricing.ts (parte 3)</span></div>
+        <pre class="max-h-[300px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">export const</span> comparisonRows = [
+  { feature: <span class="text-brand-400">"Projetos"</span>, starter: <span class="text-brand-400">"1"</span>, pro: <span class="text-brand-400">"Ilimitados"</span>, enterprise: <span class="text-brand-400">"Ilimitados"</span> },
+  { feature: <span class="text-brand-400">"Deploy automático"</span>, starter: <span class="text-brand-400">true</span>, pro: <span class="text-brand-400">true</span>, enterprise: <span class="text-brand-400">true</span> },
+  { feature: <span class="text-brand-400">"SSO"</span>, starter: <span class="text-brand-400">false</span>, pro: <span class="text-brand-400">false</span>, enterprise: <span class="text-brand-400">true</span> },
+] <span class="text-pink-400">as const</span>;
+
+<span class="text-pink-400">export const</span> pricingFaqs = [
+  { question: <span class="text-brand-400">"Posso mudar de plano?"</span>, answer: <span class="text-brand-400">"Sim — upgrades entram em vigor imediatamente."</span> },
+  { question: <span class="text-brand-400">"Starter é gratuito?"</span>, answer: <span class="text-brand-400">"Sim — perfeito para aprender Next.js."</span> },
+] <span class="text-pink-400">as const</span>;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 12/20 · <span class="text-brand-500">PricingSection</span> · toggle</h2>
+      <p class="mb-3 text-lg text-slate-300">Client component com alternância mensal/anual via <code class="font-mono text-sky-300">useState</code>.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/components/PricingSection.tsx (parte 1)</span></div>
+        <pre class="max-h-[280px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-brand-400">"use client"</span>;
+
+<span class="text-pink-400">import</span> { useState } <span class="text-pink-400">from</span> <span class="text-brand-400">"react"</span>;
+<span class="text-pink-400">import</span> { plans } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/lib/pricing"</span>;
+
+<span class="text-pink-400">export function</span> <span class="text-amber-300">PricingSection</span>() {
+  <span class="text-pink-400">const</span> [cycle, setCycle] = useState&lt;<span class="text-brand-400">"monthly" | "annual"</span>&gt;(<span class="text-brand-400">"monthly"</span>);
+
+  <span class="text-pink-400">return</span> (
+    &lt;&gt;
+      &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mt-12 flex justify-center"</span>&gt;
+        &lt;<span class="text-pink-400">button</span> <span class="text-amber-300">onClick</span>={() =&gt; setCycle(<span class="text-brand-400">"monthly"</span>)}&gt;Mensal&lt;/<span class="text-pink-400">button</span>&gt;
+        &lt;<span class="text-pink-400">button</span> <span class="text-amber-300">onClick</span>={() =&gt; setCycle(<span class="text-brand-400">"annual"</span>)}&gt;Anual&lt;/<span class="text-pink-400">button</span>&gt;
+      &lt;/<span class="text-pink-400">div</span>&gt;
+      <span class="text-slate-500">{/* cards no próximo passo */}</span>
+    &lt;/&gt;
+  );
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 13/20 · <span class="text-brand-500">PricingSection</span> · cards</h2>
+      <p class="mb-3 text-lg text-slate-300">Renderize cada plano com preço dinâmico, badge “Mais popular” e lista de features.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/components/PricingSection.tsx (parte 2)</span></div>
+        <pre class="max-h-[320px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm">&lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mt-14 grid gap-8 lg:grid-cols-3"</span>&gt;
+  {plans.map((plan) =&gt; (
+    &lt;<span class="text-pink-400">article</span> <span class="text-amber-300">key</span>={plan.id} <span class="text-amber-300">className</span>={<span class="text-brand-400">`rounded-2xl border p-8 ${plan.highlighted ? "border-brand-500/60" : "border-slate-800"}`</span>}&gt;
+      {plan.highlighted ? &lt;<span class="text-pink-400">span</span>&gt;Mais popular&lt;/<span class="text-pink-400">span</span>&gt; : <span class="text-brand-400">null</span>}
+      &lt;<span class="text-pink-400">i</span> <span class="text-amber-300">className</span>={<span class="text-brand-400">`fa-solid ${plan.icon}`</span>} /&gt;
+      &lt;<span class="text-pink-400">h3</span>&gt;{plan.name}&lt;/<span class="text-pink-400">h3</span>&gt;
+      &lt;<span class="text-pink-400">p</span>&gt;{plan.monthlyPrice === <span class="text-brand-400">null</span> ? <span class="text-brand-400">"Sob consulta"</span> : <span class="text-brand-400">`R$${plan.monthlyPrice}`</span>}&lt;/<span class="text-pink-400">p</span>&gt;
+      {plan.features.map((f) =&gt; &lt;<span class="text-pink-400">li</span> <span class="text-amber-300">key</span>={f}&gt;&lt;<span class="text-pink-400">i</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"fa-solid fa-circle-check text-brand-500"</span> /&gt; {f}&lt;/<span class="text-pink-400">li</span>&gt;)}
+      &lt;<span class="text-pink-400">Link</span> <span class="text-amber-300">href</span>={plan.ctaHref}&gt;{plan.cta}&lt;/<span class="text-pink-400">Link</span>&gt;
+    &lt;/<span class="text-pink-400">article</span>&gt;
+  ))}
+&lt;/<span class="text-pink-400">div</span>&gt;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 14/20 · <span class="text-brand-500">PricingComparison</span> e CTA</h2>
+      <p class="mb-3 text-lg text-slate-300">Tabela comparativa com helper para booleanos + bloco final de conversão.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/components/PricingComparison.tsx</span></div>
+        <pre class="max-h-[300px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import</span> { comparisonRows } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/lib/pricing"</span>;
+
+<span class="text-pink-400">export function</span> <span class="text-amber-300">PricingComparison</span>() {
+  <span class="text-pink-400">return</span> (
+    &lt;<span class="text-pink-400">table</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"w-full text-left text-sm"</span>&gt;
+      {comparisonRows.map((row) =&gt; (
+        &lt;<span class="text-pink-400">tr</span> <span class="text-amber-300">key</span>={row.feature}&gt;
+          &lt;<span class="text-pink-400">td</span>&gt;{row.feature}&lt;/<span class="text-pink-400">td</span>&gt;
+          &lt;<span class="text-pink-400">td</span>&gt;{typeof row.starter === <span class="text-brand-400">"boolean"</span> ? (row.starter ? <span class="text-brand-400">"✓"</span> : <span class="text-brand-400">"—"</span>) : row.starter}&lt;/<span class="text-pink-400">td</span>&gt;
+        &lt;/<span class="text-pink-400">tr</span>&gt;
+      ))}
+    &lt;/<span class="text-pink-400">table</span>&gt;
+  );
+}
+
+<span class="text-pink-400">export function</span> <span class="text-amber-300">PricingCta</span>() {
+  <span class="text-pink-400">return</span> &lt;<span class="text-pink-400">Link</span> <span class="text-amber-300">href</span>=<span class="text-brand-400">"/contato"</span>&gt;Falar com a equipa&lt;/<span class="text-pink-400">Link</span>&gt;;
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 15/20 · <span class="text-brand-500">PricingFaq</span> accordion</h2>
+      <p class="mb-3 text-lg text-slate-300">Accordion client — um item aberto por vez com <code class="font-mono text-sky-300">openIndex</code>.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/components/PricingFaq.tsx</span></div>
+        <pre class="max-h-[280px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-brand-400">"use client"</span>;
+<span class="text-pink-400">import</span> { useState } <span class="text-pink-400">from</span> <span class="text-brand-400">"react"</span>;
+<span class="text-pink-400">import</span> { pricingFaqs } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/lib/pricing"</span>;
+
+<span class="text-pink-400">export function</span> <span class="text-amber-300">PricingFaq</span>() {
+  <span class="text-pink-400">const</span> [openIndex, setOpenIndex] = useState&lt;<span class="text-brand-400">number | null</span>&gt;(<span class="text-brand-400">0</span>);
+  <span class="text-pink-400">return</span> pricingFaqs.map((faq, i) =&gt; (
+    &lt;<span class="text-pink-400">button</span> <span class="text-amber-300">key</span>={faq.question} <span class="text-amber-300">onClick</span>={() =&gt; setOpenIndex(openIndex === i ? <span class="text-brand-400">null</span> : i)}&gt;
+      {faq.question}
+      {openIndex === i ? &lt;<span class="text-pink-400">p</span>&gt;{faq.answer}&lt;/<span class="text-pink-400">p</span>&gt; : <span class="text-brand-400">null</span>}
+    &lt;/<span class="text-pink-400">button</span>&gt;
+  ));
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 16/20 · Reescrever <span class="text-brand-500">precos/page.tsx</span></h2>
+      <p class="mb-3 text-lg text-slate-300"><strong class="text-white">Substitua</strong> o placeholder do M2 — hero com gradiente + 4 seções compostas.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/app/precos/page.tsx</span></div>
+        <pre class="max-h-[320px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import</span> { PricingComparison, PricingCta } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/components/PricingComparison"</span>;
+<span class="text-pink-400">import</span> { PricingFaq } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/components/PricingFaq"</span>;
+<span class="text-pink-400">import</span> { PricingSection } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/components/PricingSection"</span>;
+
+<span class="text-pink-400">export default function</span> <span class="text-amber-300">PrecosPage</span>() {
+  <span class="text-pink-400">return</span> (
+    &lt;&gt;
+      &lt;<span class="text-pink-400">section</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"py-20 text-center"</span>&gt;&lt;<span class="text-pink-400">h1</span>&gt;Planos que crescem com o seu projeto&lt;/<span class="text-pink-400">h1</span>&gt;&lt;/<span class="text-pink-400">section</span>&gt;
+      &lt;<span class="text-pink-400">section</span>&gt;&lt;<span class="text-amber-300">PricingSection</span> /&gt;&lt;/<span class="text-pink-400">section</span>&gt;
+      &lt;<span class="text-pink-400">section</span>&gt;&lt;<span class="text-amber-300">PricingComparison</span> /&gt;&lt;/<span class="text-pink-400">section</span>&gt;
+      &lt;<span class="text-pink-400">section</span>&gt;&lt;<span class="text-amber-300">PricingFaq</span> /&gt;&lt;/<span class="text-pink-400">section</span>&gt;
+      &lt;<span class="text-pink-400">section</span>&gt;&lt;<span class="text-amber-300">PricingCta</span> /&gt;&lt;/<span class="text-pink-400">section</span>&gt;
+    &lt;/&gt;
+  );
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="flex w-full grow flex-col items-center justify-center text-center">
+      <hr class="mb-6 h-2 w-36 border-0 bg-brand-500">
+      <h2 class="mb-4 text-4xl font-extrabold uppercase text-brand-500 sm:text-5xl">Página de Contato</h2>
+      <p class="max-w-3xl text-xl text-slate-400">Complete a rota /contato com dados, canais e formulário interativo.</p>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 17/20 · Dados em <span class="text-brand-500">contact.ts</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Canais, horário de atendimento e opções do select de assunto.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/lib/contact.ts</span></div>
+        <pre class="max-h-[300px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">export const</span> contactChannels = [
+  { icon: <span class="text-brand-400">"fa-envelope"</span>, label: <span class="text-brand-400">"Email"</span>, value: <span class="text-brand-400">"ola@fluxolab.dev"</span>, href: <span class="text-brand-400">"mailto:ola@fluxolab.dev"</span> },
+  { icon: <span class="text-brand-400">"fa-comments"</span>, label: <span class="text-brand-400">"Discord"</span>, value: <span class="text-brand-400">"Comunidade FluxoLab"</span>, href: <span class="text-brand-400">"#"</span> },
+] <span class="text-pink-400">as const</span>;
+
+<span class="text-pink-400">export const</span> officeHours = {
+  weekdays: <span class="text-brand-400">"Seg–Sex, 9h–18h (BRT)"</span>,
+  status: <span class="text-brand-400">"Online agora"</span>,
+};
+
+<span class="text-pink-400">export const</span> subjectOptions = [
+  { value: <span class="text-brand-400">"geral"</span>, label: <span class="text-brand-400">"Dúvida geral"</span> },
+  { value: <span class="text-brand-400">"pro"</span>, label: <span class="text-brand-400">"Plano Pro"</span> },
+] <span class="text-pink-400">as const</span>;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 18/20 · <span class="text-brand-500">ContactChannels</span></h2>
+      <p class="mb-3 text-lg text-slate-300">Coluna lateral com status de atendimento, canais e endereço — dados vêm de <code class="font-mono text-sky-300">contact.ts</code>.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/components/ContactChannels.tsx</span></div>
+        <pre class="max-h-[300px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import</span> { contactChannels, officeHours } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/lib/contact"</span>;
+
+<span class="text-pink-400">export function</span> <span class="text-amber-300">ContactChannels</span>() {
+  <span class="text-pink-400">return</span> (
+    &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"space-y-6"</span>&gt;
+      &lt;<span class="text-pink-400">p</span>&gt;{officeHours.status} · {officeHours.weekdays}&lt;/<span class="text-pink-400">p</span>&gt;
+      {contactChannels.map((ch) =&gt; (
+        &lt;<span class="text-pink-400">a</span> <span class="text-amber-300">key</span>={ch.label} <span class="text-amber-300">href</span>={ch.href}&gt;
+          &lt;<span class="text-pink-400">i</span> <span class="text-amber-300">className</span>={<span class="text-brand-400">`fa-solid ${ch.icon}`</span>} /&gt; {ch.value}
+        &lt;/<span class="text-pink-400">a</span>&gt;
+      ))}
+    &lt;/<span class="text-pink-400">div</span>&gt;
+  );
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 19/20 · <span class="text-brand-500">ContactForm</span> · completo</h2>
+      <p class="mb-3 text-lg text-slate-300">Formulário controlado com loading simulado e tela de sucesso.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/components/ContactForm.tsx (parte 1)</span></div>
+        <pre class="max-h-[300px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-brand-400">"use client"</span>;
+<span class="text-pink-400">import</span> { useState } <span class="text-pink-400">from</span> <span class="text-brand-400">"react"</span>;
+<span class="text-pink-400">import</span> { subjectOptions } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/lib/contact"</span>;
+
+<span class="text-pink-400">export function</span> <span class="text-amber-300">ContactForm</span>() {
+  <span class="text-pink-400">const</span> [form, setForm] = useState({ nome: <span class="text-brand-400">""</span>, email: <span class="text-brand-400">""</span>, assunto: <span class="text-brand-400">"geral"</span>, mensagem: <span class="text-brand-400">""</span> });
+  <span class="text-pink-400">const</span> [submitted, setSubmitted] = useState(<span class="text-brand-400">false</span>);
+  <span class="text-pink-400">const</span> [loading, setLoading] = useState(<span class="text-brand-400">false</span>);
+
+  <span class="text-pink-400">async function</span> <span class="text-amber-300">handleSubmit</span>(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(<span class="text-brand-400">true</span>);
+    await <span class="text-pink-400">new</span> Promise((r) =&gt; setTimeout(r, <span class="text-brand-400">800</span>));
+    setLoading(<span class="text-brand-400">false</span>);
+    setSubmitted(<span class="text-brand-400">true</span>);
+  }
+
+  <span class="text-pink-400">if</span> (submitted) <span class="text-pink-400">return</span> &lt;<span class="text-pink-400">div</span>&gt;Mensagem enviada! Obrigado, {form.nome}.&lt;/<span class="text-pink-400">div</span>&gt;;
+  <span class="text-slate-500">{/* campos no próximo passo */}</span>
+}</pre>
+      </div>
+      
+      <p class="mt-4 mb-3 text-lg text-slate-300">Campos do formulário:</p>
+      <div class="mt-3 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <pre class="max-h-[300px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm">&lt;<span class="text-pink-400">form</span> <span class="text-amber-300">onSubmit</span>={handleSubmit} <span class="text-amber-300">className</span>=<span class="text-brand-400">"space-y-5"</span>&gt;
+  &lt;<span class="text-pink-400">input</span> <span class="text-amber-300">name</span>=<span class="text-brand-400">"nome"</span> <span class="text-amber-300">value</span>={form.nome} <span class="text-amber-300">onChange</span>={(e) =&gt; setForm({...form, nome: e.target.value})} <span class="text-amber-300">required</span> /&gt;
+  &lt;<span class="text-pink-400">input</span> <span class="text-amber-300">name</span>=<span class="text-brand-400">"email"</span> <span class="text-amber-300">type</span>=<span class="text-brand-400">"email"</span> <span class="text-amber-300">value</span>={form.email} <span class="text-amber-300">onChange</span>={...} <span class="text-amber-300">required</span> /&gt;
+  &lt;<span class="text-pink-400">select</span> <span class="text-amber-300">name</span>=<span class="text-brand-400">"assunto"</span> <span class="text-amber-300">value</span>={form.assunto} <span class="text-amber-300">onChange</span>={...}&gt;
+    {subjectOptions.map((o) =&gt; &lt;<span class="text-pink-400">option</span> <span class="text-amber-300">key</span>={o.value} <span class="text-amber-300">value</span>={o.value}&gt;{o.label}&lt;/<span class="text-pink-400">option</span>&gt;)}
+  &lt;/<span class="text-pink-400">select</span>&gt;
+  &lt;<span class="text-pink-400">textarea</span> <span class="text-amber-300">name</span>=<span class="text-brand-400">"mensagem"</span> <span class="text-amber-300">rows</span>={<span class="text-brand-400">5</span>} <span class="text-amber-300">value</span>={form.mensagem} <span class="text-amber-300">onChange</span>={...} <span class="text-amber-300">required</span> /&gt;
+  &lt;<span class="text-pink-400">button</span> <span class="text-amber-300">type</span>=<span class="text-brand-400">"submit"</span> <span class="text-amber-300">disabled</span>={loading}&gt;{loading ? <span class="text-brand-400">"Enviando…"</span> : <span class="text-brand-400">"Enviar mensagem"</span>}&lt;/<span class="text-pink-400">button</span>&gt;
+&lt;/<span class="text-pink-400">form</span>&gt;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Passo 20/20 · Reescrever <span class="text-brand-500">contato/page.tsx</span></h2>
+      <p class="mb-3 text-lg text-slate-300"><strong class="text-white">Substitua</strong> o form estático do M2 — grid 2+3 colunas com canais e formulário.</p>
+      <div class="mt-4 w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-900 font-mono shadow-xl">
+        <div class="flex gap-2 border-b border-slate-700 bg-slate-800 px-4 py-2"><span class="ml-2 text-xs text-slate-500">src/app/contato/page.tsx</span></div>
+        <pre class="max-h-[320px] overflow-auto p-5 text-xs leading-relaxed text-slate-300 md:text-sm"><span class="text-pink-400">import</span> { ContactChannels } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/components/ContactChannels"</span>;
+<span class="text-pink-400">import</span> { ContactForm } <span class="text-pink-400">from</span> <span class="text-brand-400">"@/components/ContactForm"</span>;
+<span class="text-pink-400">import</span> Link <span class="text-pink-400">from</span> <span class="text-brand-400">"next/link"</span>;
+
+<span class="text-pink-400">export default function</span> <span class="text-amber-300">ContatoPage</span>() {
+  <span class="text-pink-400">return</span> (
+    &lt;&gt;
+      &lt;<span class="text-pink-400">section</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"py-20 text-center"</span>&gt;&lt;<span class="text-pink-400">h1</span>&gt;Vamos construir algo juntos&lt;/<span class="text-pink-400">h1</span>&gt;&lt;/<span class="text-pink-400">section</span>&gt;
+      &lt;<span class="text-pink-400">section</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"mx-auto grid max-w-6xl gap-12 lg:grid-cols-5"</span>&gt;
+        &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"lg:col-span-2"</span>&gt;&lt;<span class="text-amber-300">ContactChannels</span> /&gt;&lt;/<span class="text-pink-400">div</span>&gt;
+        &lt;<span class="text-pink-400">div</span> <span class="text-amber-300">className</span>=<span class="text-brand-400">"lg:col-span-3"</span>&gt;&lt;<span class="text-amber-300">ContactForm</span> /&gt;&lt;/<span class="text-pink-400">div</span>&gt;
+      &lt;/<span class="text-pink-400">section</span>&gt;
+      &lt;<span class="text-pink-400">p</span>&gt;Procurando planos? &lt;<span class="text-pink-400">Link</span> <span class="text-amber-300">href</span>=<span class="text-brand-400">"/precos"</span>&gt;Veja preços →&lt;/<span class="text-pink-400">Link</span>&gt;&lt;/<span class="text-pink-400">p</span>&gt;
+    &lt;/&gt;
+  );
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  
+
+  <div class="slide-container">
+    <div class="content-area flex w-full grow flex-col justify-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Checkpoint <span class="text-brand-500">M2</span></h2>
+      <ul class="space-y-4 text-lg text-slate-300">
+        <li><i class="fa-solid fa-check text-brand-500"></i> Header persistente no layout global.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Páginas <code class="font-mono text-sky-300">/precos</code> e <code class="font-mono text-sky-300">/contato</code> com planos, tabela, FAQ e formulário.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Navegação com <code class="font-mono text-sky-300">Link</code> e links centralizados em <code class="font-mono text-sky-300">lib/site.ts</code>.</li>
+        <li><i class="fa-solid fa-check text-brand-500"></i> Metadata configurada por página.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="slide-container">
+    <div class="content-area flex w-full min-h-0 grow flex-col items-center justify-center px-4 text-center">
+      <h2 class="slide-title mb-6 w-full border-l-8 border-brand-500 pl-4 text-left text-2xl font-bold uppercase tracking-wide text-white sm:text-3xl md:text-4xl">Navegação <span class="text-brand-500">entre módulos</span></h2>
+      <p class="mb-8 max-w-2xl text-lg text-slate-400">Módulo 2 concluído. Siga para componentes e interatividade no Módulo 3, ou volte ao Módulo 1 para revisão.</p>
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <a href="modulo-1-intro-setup.html" class="inline-flex items-center gap-2 rounded-xl border border-slate-600 bg-slate-800 px-6 py-3 font-semibold text-slate-200 transition hover:border-slate-500 hover:bg-slate-700"><i class="fa-solid fa-arrow-left"></i> Voltar ao Módulo 1</a>
+        <a href="modulo-3-componentes-client.html" class="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-6 py-3 font-bold text-slate-950 transition hover:bg-brand-400">Abrir Módulo 3 <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+  </div></div>
+
+<script src="script.js"></script>
+</body>
+</html>

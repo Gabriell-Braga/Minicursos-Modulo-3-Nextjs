@@ -1,0 +1,31 @@
+---
+description: Links externos dos slides no GitHub Pages — repositório e app online
+globs: modulo-*.html,README.md,site-urls.json
+alwaysApply: false
+---
+
+# Slides no GitHub Pages — links do header
+
+As apresentações (`modulo-*.html`) serão publicadas no **GitHub Pages**. Não usar links para pastas locais do repositório.
+
+## Proibido nos headers e CTAs públicos
+
+- `exemplos/fluxolab-app/` (link “Pasta”)
+- Caminhos relativos que só funcionam no filesystem local
+- `README.md` como destino principal de navegação do curso
+
+## Usar em vez disso (URLs em `site-urls.json`)
+
+1. **Repositório GitHub** — código-fonte do minicurso / FluxoLab
+2. **Projeto final online** — app FluxoLab deployado (GitHub Pages ou outro host)
+
+Quando o usuário informar as URLs, atualizar `site-urls.json` e propagar para os 4 arquivos `modulo-*.html` (seção Projeto do header + links finais de checkpoint/referência).
+
+## Padrão do header (módulos 2–4)
+
+```html
+<a href="URL_GITHUB" ...>GitHub</a>
+<a href="URL_APP_ONLINE" ...>App online</a>
+```
+
+Módulo 1: alinhar o bloco “Projeto” ao mesmo padrão (hoje ainda aponta para README local).
